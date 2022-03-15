@@ -1,0 +1,9 @@
+[package]
+name = "fuedle-client"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+laminar = "0.3"
+crossbeam-channel = "0.3.9"
+shared = { path = "../shared" }
