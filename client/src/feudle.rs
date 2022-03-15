@@ -5,16 +5,17 @@ struct Letter {
     in_word: bool,
     in_position: bool,
 }
-struct FeudleGame {
+
+pub struct Feudle {
     letter_map: HashMap<char, Letter>,
     word: String,
     total_guesses: u32,
     guesses: u32,
 }
 
-impl FeudleGame {
+impl Feudle {
     //new func
-    fn new(word: String) -> FeudleGame {
+    pub fn new(word: String) -> Feudle {
         let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         let mut letters = HashMap::new();
         for letter in alphabet.chars() {
@@ -24,7 +25,7 @@ impl FeudleGame {
                 in_position: false,
             });
         }
-        FeudleGame {
+        Feudle {
             letter_map: letters,
             word: word.to_ascii_uppercase(),
             total_guesses: 6,
@@ -32,7 +33,7 @@ impl FeudleGame {
         }
     }
     //guess func take word 
-    fn guess(&mut self, word_guess: &String) -> bool {
+    pub fn guess(&mut self, word_guess: &String) -> bool {
         for ch in word_guess.chars() {
             //check if an alphabet
             if ch.is_alphabetic() {
@@ -53,7 +54,7 @@ impl FeudleGame {
             self.check_win()
         }
 
-    fn check_win(&self) -> bool {
+    pub fn check_win(&self) -> bool {
         for letter in self.word.chars() {
             let letter = self.letter_map.get(&letter).unwrap();
             if !letter.in_position {
@@ -63,7 +64,7 @@ impl FeudleGame {
         return  true;
     }
 
-    fn print_word(&self) {
+    pub fn print_word(&self) {
         for letter in self.word.chars() {
             let cap = letter.to_ascii_uppercase();
             let alpha = self.letter_map.get(&letter).unwrap();
@@ -76,10 +77,17 @@ impl FeudleGame {
         println!("");
     }
 
+    pub fn update(&mut self, should_update : bool) {
+        
+    }
+
 }
 
+
+
+
 fn main() {
-    let mut game = FeudleGame::new("hello".to_string());
+    let mut game = Feudle::new("hello".to_string());
     let mut word_guess = String::new();
     loop {
         println!("Guess a letter");
