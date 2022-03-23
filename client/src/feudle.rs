@@ -1,5 +1,6 @@
 use std::collections::HashMap;
-
+use core::time;
+use shared::PlayerId;
 struct Letter {
     guessed: bool,
     in_word: bool,
@@ -9,8 +10,10 @@ struct Letter {
 pub struct Feudle {
     letter_map: HashMap<char, Letter>,
     word: String,
-    total_guesses: u32,
-    guesses: u32,
+    pub total_guesses: u32,
+    pub guesses: u32,
+    game_started: bool,
+    id: PlayerId,
 }
 
 impl Feudle {
@@ -30,8 +33,23 @@ impl Feudle {
             word: word.to_ascii_uppercase(),
             total_guesses: 6,
             guesses: 0,
+            game_started: true,
+            id: 0,
         }
     }
+
+    pub fn set_id(&mut self, id: PlayerId) {
+        self.id = id;
+    }
+
+    pub fn get_id(&self) -> PlayerId {
+        self.id
+    }
+    
+    pub fn game_started(&self) -> bool {
+        self.game_started
+    }
+
     //guess func take word 
     pub fn guess(&mut self, word_guess: &String) -> bool {
         for ch in word_guess.chars() {
@@ -77,12 +95,17 @@ impl Feudle {
         println!("");
     }
 
+    pub fn end_game(&mut self) {
+        std::thread::sleep(time::Duration::from_millis(10000));
+        //set game_started to false
+        self.game_started = false;
+        println!("You lose!");
+    }
+
     pub fn update(&mut self, should_update : bool) {
         
     }
-
 }
-
 
 
 

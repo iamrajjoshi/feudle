@@ -3,9 +3,9 @@ use std::{thread};
 use std::collections::HashMap;
 use std::net::SocketAddr;
 use crossbeam_channel::Sender;
-use laminar::{ErrorKind, Packet, Socket, SocketEvent};
+use laminar::{ErrorKind, Packet, Socket, SocketEvent, Config};
 use shared::{MessageType, PlayerId, MAGIC_BYTE, MAX_PLAYERS};
-
+//use rand
 struct ServerState {
     pub player_ids: Vec<PlayerId>,
     pub address_to_id: HashMap<SocketAddr, PlayerId>,
@@ -52,12 +52,14 @@ impl ServerState {
 fn send_packet(sender: &Sender<Packet>, address: SocketAddr, message_type: MessageType, payload: Vec<u8>) {
     let mut final_payload = vec![MAGIC_BYTE, message_type as u8];
     final_payload.extend(payload);
-    sender.send(Packet::reliable_ordered(address, final_payload, Some(0))).unwrap();
+   
+    sender.send(Packet::reliable_sequenced(address, final_payload, Some(0))).unwrap();
 }
 
 
 
 fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerState) {
+    println!("{:?}", packet);
     let address = packet.addr();
     let payload = packet.payload();
 
@@ -89,7 +91,9 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
                 //send start event with word to all players from  hashmap
                 for (&player_address, _) in state.address_to_id.iter() {
                     //TODO: ADD LOGIC FOR GETTING WORD
-                    send_packet(sender, player_address, MessageType::StartEvent, vec![]);
+                    //get random number for index of word
+                    let index = 0;
+                    send_packet(sender, player_address, MessageType::StartEvent, vec![index]);
                 }
             }
         },
@@ -108,15 +112,17 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
             let id = payload[0];
             // let num_guesses = payload[1];
             // let address = state.id_to_address.get(&id).unwrap();
+            print!("Player {} finished", id);
             state.end_game();
             //send won event to all players, but send lost event to other player
             // TODO: ADD LOGIC TO SEE WHO GUESSED IT IN LESS WORDS
             for (&player_address, _) in state.address_to_id.iter() {
-                    send_packet(sender, player_address, MessageType::EndEvent, vec![id]);
+                    print!("SENDING END EVENT TO {}", player_address);
+                    send_packet(sender, player_address, MessageType::EndEvent, vec![id, 2]);
             }
         },
         x  if x == MessageType::Heartbeat as u8 => {
-            println!("Heartbeat from {}", address);
+            // println!("Heartbeat from {}", address);
             send_packet(sender, address, MessageType::Heartbeat, vec![]);
         },
         _ => {},
@@ -125,11 +131,17 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
 
 pub fn server() -> Result<(), ErrorKind> {
     let mut state = ServerState::new();
-    let mut socket = Socket::bind("127.0.0.1:8000").unwrap();
+    let config = Config {
+        heartbeat_interval: Some(time::Duration::from_millis(10)),
+        ..Config::default()
+    };
+    let mut socket = Socket::bind_with_config("127.0.0.1:8000", config).unwrap();
     
     let (sender, receiver) = (
         socket.get_packet_sender(), socket.get_event_receiver());
-    let _thread = thread::spawn(move || socket.start_polling());
+    
+        let _thread = thread::spawn(move || socket.start_polling());
+
     loop {
         if let Ok(event) = receiver.try_recv() {
             match event {
@@ -145,9 +157,5 @@ pub fn server() -> Result<(), ErrorKind> {
             }
         }
         std::thread::sleep(time::Duration::from_millis(100));
-        //send a heartbeat to all players
-        for (&player_address, _) in state.address_to_id.iter() {
-            send_packet(&sender, player_address, MessageType::Heartbeat, vec![]);
-        }
     }
 }
