@@ -46,4 +46,3 @@
 
 * [GitHub - imathur1/snek-game](https://github.com/imathur1/snek-game)
 
-* 
