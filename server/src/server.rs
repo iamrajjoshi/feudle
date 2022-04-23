@@ -5,7 +5,7 @@ use std::net::SocketAddr;
 use crossbeam_channel::Sender;
 use laminar::{ErrorKind, Packet, Socket, SocketEvent, Config};
 use shared::{MessageType, PlayerId, MAGIC_BYTE, MAX_PLAYERS};
-//use rand
+use rand::Rng;
 struct ServerState {
     pub player_ids: Vec<PlayerId>,
     pub address_to_id: HashMap<SocketAddr, PlayerId>,
@@ -50,6 +50,22 @@ impl ServerState {
 }
 
 fn send_packet(sender: &Sender<Packet>, address: SocketAddr, message_type: MessageType, payload: Vec<u8>) {
+    //print message type as a string
+    let message_type_string = match message_type {
+        MessageType::Heartbeat => "Heartbeat",
+        MessageType::JoinEvent => "JoinEvent",
+        MessageType::AssignIdEvent => "AssignIdEvent",
+        MessageType::ReadyEvent => "ReadyEvent",
+        MessageType::StartEvent => "StartEvent",
+        MessageType::GuessEvent => "GuessEvent",
+        MessageType::FinishEvent => "FinishEvent",
+        MessageType::EndEvent => "EndEvent",
+        MessageType::LoseEvent => "LoseEvent",
+        _ => "Unknown",
+    };
+    println!("Sending {} to {}", message_type_string, address);
+
+
     let mut final_payload = vec![MAGIC_BYTE, message_type as u8];
     final_payload.extend(payload);
    
@@ -59,7 +75,7 @@ fn send_packet(sender: &Sender<Packet>, address: SocketAddr, message_type: Messa
 
 
 fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerState) {
-    println!("{:?}", packet);
+    
     let address = packet.addr();
     let payload = packet.payload();
 
@@ -69,6 +85,18 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
     }
     
     let message_type = payload[1];
+    
+    let message_type_string = match message_type {
+        x if x == MessageType::JoinEvent as u8 => "JoinEvent",
+        x if x == MessageType::ReadyEvent as u8 => "ReadyEvent",
+        x if x == MessageType::GuessEvent as u8 => "GuessEvent",
+        x if x == MessageType::FinishEvent as u8 => "FinishEvent",
+        x if x == MessageType::Heartbeat as u8 => "Heartbeat",
+        _ => "Unknown",
+    };
+    println!("Received {}", message_type_string);
+
+    
     let data = &payload[2..];
 
     match message_type {
@@ -88,28 +116,31 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
             if state.players_ready.len() == MAX_PLAYERS {
                 println!("Starting game");
                 state.start_game();
+                let index: u8 = rand::thread_rng().gen_range(0..254);
                 //send start event with word to all players from  hashmap
                 for (&player_address, _) in state.address_to_id.iter() {
                     //TODO: ADD LOGIC FOR GETTING WORD
                     //get random number for index of word
-                    let index = 0;
+                    
                     send_packet(sender, player_address, MessageType::StartEvent, vec![index]);
                 }
             }
         },
         x if x == MessageType::GuessEvent as u8 => {
-            let id = payload[0];
-            let guess = payload[1];
+            let id = data[0];
+            let mut guess = &data[1..];
             let address = state.id_to_address.get(&id).unwrap();
+            let mut payload = vec![id];
+            payload.extend(guess);
             //send guess to other players
             for (&player_address, _) in state.address_to_id.iter() {
                 if player_address != *address {
-                    send_packet(sender, player_address, MessageType::GuessEvent, vec![id, guess]);
+                    send_packet(sender, player_address, MessageType::GuessEvent, payload.clone());
                 }
             }
         },
         x if x == MessageType::FinishEvent as u8 => {
-            let id = payload[0];
+            let id = data[0];
             // let num_guesses = payload[1];
             // let address = state.id_to_address.get(&id).unwrap();
             print!("Player {} finished", id);

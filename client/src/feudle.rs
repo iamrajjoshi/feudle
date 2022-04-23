@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 use core::time;
 use shared::PlayerId;
+
 struct Letter {
     guessed: bool,
     in_word: bool,
@@ -10,15 +11,13 @@ struct Letter {
 pub struct Feudle {
     letter_map: HashMap<char, Letter>,
     word: String,
-    pub total_guesses: u32,
-    pub guesses: u32,
-    game_started: bool,
-    id: PlayerId,
+    total_guesses: u32,
+    guesses: u32,
 }
 
 impl Feudle {
     //new func
-    pub fn new(word: String) -> Feudle {
+    pub fn new() -> Feudle {
         let alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         let mut letters = HashMap::new();
         for letter in alphabet.chars() {
@@ -30,24 +29,14 @@ impl Feudle {
         }
         Feudle {
             letter_map: letters,
-            word: word.to_ascii_uppercase(),
+            word: String::new(),
             total_guesses: 6,
             guesses: 0,
-            game_started: true,
-            id: 0,
         }
     }
-
-    pub fn set_id(&mut self, id: PlayerId) {
-        self.id = id;
-    }
-
-    pub fn get_id(&self) -> PlayerId {
-        self.id
-    }
     
-    pub fn game_started(&self) -> bool {
-        self.game_started
+    pub fn set_word(&mut self, word: String) {
+        self.word =  word.to_ascii_uppercase();
     }
 
     //guess func take word 
@@ -82,6 +71,13 @@ impl Feudle {
         return  true;
     }
 
+    pub fn check_lose(&self) -> bool {
+        if self.guesses >= self.total_guesses {
+            return true;
+        }
+        return false;
+    }
+
     pub fn print_word(&self) {
         for letter in self.word.chars() {
             let cap = letter.to_ascii_uppercase();
@@ -97,34 +93,10 @@ impl Feudle {
 
     pub fn end_game(&mut self) {
         std::thread::sleep(time::Duration::from_millis(10000));
-        //set game_started to false
-        self.game_started = false;
         println!("You lose!");
     }
 
     pub fn update(&mut self, should_update : bool) {
         
-    }
-}
-
-
-
-fn main() {
-    let mut game = Feudle::new("hello".to_string());
-    let mut word_guess = String::new();
-    loop {
-        println!("Guess a letter");
-        
-        std::io::stdin().read_line(&mut word_guess).expect("Failed to read line");
-        game.guess(&word_guess);
-        game.print_word();
-        if game.check_win() {
-            println!("You win!");
-            break;
-        }
-        if game.guesses == game.total_guesses {
-            println!("You lose!");
-            break;
-        }
     }
 }

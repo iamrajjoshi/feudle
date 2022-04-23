@@ -1,9 +1,10 @@
 [package]
-name = "fuedle-client"
+name = "feudle-client"
 version = "1.0.0"
 edition = "2021"
 
 [dependencies]
 laminar = "0.3"
 crossbeam-channel = "0.3.9"
+rand = "0.8.0"
 shared = { path = "../shared" }
