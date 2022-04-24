@@ -179,6 +179,8 @@ fn main() -> Result<(), ErrorKind> {
             }
         };
     }
+
+    println!("Listening on {}", addr);
     // socket = Socket::bind_with_config("127.0.0.1:8452", config).unwrap();
 
     // Tell server to add the client
@@ -187,7 +189,7 @@ fn main() -> Result<(), ErrorKind> {
         socket.get_packet_sender(), socket.get_event_receiver());
     send_packet(&sender, server_address, MessageType::JoinEvent, vec![]);
     socket.manual_poll(Instant::now());
-    println!("Attempting to join server {}...", server_address);
+    println!("Attempting to join server {}", server_address);
 
     let game = Arc::new(Mutex::new(Feudle::new()));
     let state = Arc::new(Mutex::new(ClientState::new()));
@@ -201,7 +203,8 @@ fn main() -> Result<(), ErrorKind> {
     
     let _game_thread = thread::spawn(move || {
         while state_cpy.lock().unwrap().get_ready() == false {
-            println!("Are you ready? (y/n)");
+            print!("Are you ready? (y/n): ");
+            io::stdout().flush().unwrap();
             let mut input = String::new();
             std::io::stdin().read_line(&mut &mut input).unwrap();
             input = input.trim().to_string();
