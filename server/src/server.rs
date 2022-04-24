@@ -60,7 +60,6 @@ fn send_packet(sender: &Sender<Packet>, address: SocketAddr, message_type: Messa
         MessageType::GuessEvent => "GuessEvent",
         MessageType::FinishEvent => "FinishEvent",
         MessageType::EndEvent => "EndEvent",
-        MessageType::LoseEvent => "LoseEvent",
         _ => "Unknown",
     };
     println!("Sending {} to {}", message_type_string, address);
@@ -92,6 +91,7 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
         x if x == MessageType::GuessEvent as u8 => "GuessEvent",
         x if x == MessageType::FinishEvent as u8 => "FinishEvent",
         x if x == MessageType::Heartbeat as u8 => "Heartbeat",
+        x if x == MessageType::LoseEvent as u8 => "LoseEvent",
         _ => "Unknown",
     };
     println!("Received {}", message_type_string);
@@ -148,9 +148,22 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
             //send won event to all players, but send lost event to other player
             // TODO: ADD LOGIC TO SEE WHO GUESSED IT IN LESS WORDS
             for (&player_address, _) in state.address_to_id.iter() {
-                    print!("SENDING END EVENT TO {}", player_address);
-                    send_packet(sender, player_address, MessageType::EndEvent, vec![id, 2]);
+                    send_packet(sender, player_address, MessageType::EndEvent, vec![id]);
             }
+        },
+        x if x == MessageType::LoseEvent as u8 => {
+            let id = data[0];
+            let winning_id = if (id == 0) {1} else{0};
+            // let num_guesses = payload[1];
+            // let address = state.id_to_address.get(&id).unwrap();
+            print!("Player {} lost", id);
+            print!("Player {} won", winning_id);
+            state.end_game();
+            //send won event to all players, but send lost event to other player
+            for (&player_address, _) in state.address_to_id.iter() {
+                send_packet(sender, player_address, MessageType::EndEvent, vec![winning_id]);
+        }
+
         },
         x  if x == MessageType::Heartbeat as u8 => {
             // println!("Heartbeat from {}", address);

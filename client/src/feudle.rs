@@ -1,7 +1,7 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, io};
 use core::time;
 use shared::PlayerId;
-
+use std::io::Write;
 struct Letter {
     guessed: bool,
     in_word: bool,
@@ -13,6 +13,7 @@ pub struct Feudle {
     word: String,
     total_guesses: u32,
     guesses: u32,
+    guess: String,
 }
 
 impl Feudle {
@@ -30,6 +31,7 @@ impl Feudle {
         Feudle {
             letter_map: letters,
             word: String::new(),
+            guess: String::new(),
             total_guesses: 6,
             guesses: 0,
         }
@@ -41,7 +43,9 @@ impl Feudle {
 
     //guess func take word 
     pub fn guess(&mut self, word_guess: &String) -> bool {
-        for ch in word_guess.chars() {
+        let mut upper_case_word_guess = word_guess.to_ascii_uppercase();
+        self.guess = upper_case_word_guess.clone();
+        for ch in upper_case_word_guess.chars() {
             //check if an alphabet
             if ch.is_alphabetic() {
                 let mut letter = self.letter_map.get_mut(&ch).unwrap();
@@ -49,12 +53,15 @@ impl Feudle {
                 if self.word.contains(ch) {
                     letter.in_word = true;
                 }
-                //set if letter is in position of word
-                for (i, c) in self.word.chars().enumerate() {
-                    if c == self.word.to_string().chars().nth(0).unwrap() {
-                        letter.in_position = true;
-                    }
-                }
+                
+                
+            }
+        }
+        //set if letter is in position of word
+        for (i, c) in upper_case_word_guess.chars().enumerate() {
+            let mut letter = self.letter_map.get_mut(&c).unwrap();
+            if c == self.word.to_string().chars().nth(i).unwrap() {
+                letter.in_position = true;
             }
         }
             self.guesses += 1;
@@ -62,13 +69,7 @@ impl Feudle {
         }
 
     pub fn check_win(&self) -> bool {
-        for letter in self.word.chars() {
-            let letter = self.letter_map.get(&letter).unwrap();
-            if !letter.in_position {
-                return false;
-            }
-        }
-        return  true;
+        return self.guess == self.word;
     }
 
     pub fn check_lose(&self) -> bool {
@@ -89,11 +90,7 @@ impl Feudle {
             }
         }
         println!("");
-    }
-
-    pub fn end_game(&mut self) {
-        std::thread::sleep(time::Duration::from_millis(10000));
-        println!("You lose!");
+        io::stdout().flush().unwrap();
     }
 
     pub fn update(&mut self, should_update : bool) {

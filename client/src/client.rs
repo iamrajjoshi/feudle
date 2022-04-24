@@ -1,5 +1,6 @@
 use std::net::SocketAddr;
 use std::time::Instant;
+use std::io;
 use laminar::{ErrorKind, Packet, Socket, SocketEvent, Config};
 use shared::{MessageType, MAGIC_BYTE, PlayerId};
 use crate::feudle::Feudle;
@@ -7,7 +8,7 @@ use crossbeam_channel::Sender;
 use std::{thread};
 use std::sync::{Arc, Mutex};
 use core::time;
-
+use std::io::Write;
 struct ClientState {
     id: PlayerId,
     ready: bool,
@@ -64,13 +65,13 @@ impl  ClientState {
     }
 
     pub fn get_color_vec(&self, guess: String) -> Vec<char> {
+        let uppercase_guess = guess.to_uppercase();
         let mut color_vec = Vec::new();
-        //loop through guess
-        for ch in guess.chars() {
-            if self.word.contains(ch) && self.word.to_string().chars().nth(0) == Some(ch) {
+        for (i, c ) in uppercase_guess.chars().enumerate() {
+            if self.word.contains(c) && self.word.to_string().chars().nth(i) == Some(c) {
                 color_vec.push('G');
             }
-            else if self.word.contains(ch) && self.word.to_string().chars().nth(0) != Some(ch) {
+            else if self.word.contains(c) && self.word.to_string().chars().nth(i) != Some(c) {
                 color_vec.push('Y');
             }
             else {
@@ -2412,15 +2413,14 @@ pub fn dictionary_words(index: usize) -> String {
 fn send_packet(sender: &Sender<Packet>, address: SocketAddr, message_type: MessageType, payload: Vec<u8>) {
     let mut final_payload = vec![MAGIC_BYTE, message_type as u8];
     final_payload.extend(payload.iter());
-    //print payload
-    print!("Sending packet to {}: {:?}", address, final_payload);
+    // print!("Sending packet to {}: {:?}", address, final_payload);
 
     sender.send(Packet::reliable_sequenced(address, final_payload, Some(0))).unwrap();
 }
 
 fn handle_packet(packet: &Packet, game: Arc<Mutex<Feudle>>, state: Arc<Mutex<ClientState>>) -> bool {
     let payload = packet.payload();
-    print!("Received packet: {:?}", payload);
+    // print!("Received packet: {:?}", payload);
     if payload[0] != MAGIC_BYTE {
         println!("Received packet with invalid magic byte");
         return false;
@@ -2436,12 +2436,12 @@ fn handle_packet(packet: &Packet, game: Arc<Mutex<Feudle>>, state: Arc<Mutex<Cli
         x  if x == MessageType::Heartbeat as u8 => "Heartbeat",
         _ => "Unknown",
     };
-    println!("Received {}", message_type_string);
+    // println!("Received {}", message_type_string);
 
     match message_type {
         x if x == MessageType::AssignIdEvent as u8 => {
             let assigned_id = data[0];
-            println!("Assigned ID {}", assigned_id);
+            // println!("Assigned ID {}", assigned_id);
             state.lock().unwrap().set_id(assigned_id as PlayerId);
             return false;
         },
@@ -2450,25 +2450,23 @@ fn handle_packet(packet: &Packet, game: Arc<Mutex<Feudle>>, state: Arc<Mutex<Cli
             let word = dictionary_words(index as usize);
             println!("Starting game with word {}", word);
             game.lock().unwrap().set_word(word.clone());
-            state.lock().unwrap().set_word(word);
+            state.lock().unwrap().set_word(word.to_uppercase());
             state.lock().unwrap().set_game_started(true);
             return true;
         },
         x if x == MessageType::GuessEvent as u8 => {
             let id = data[0];
             //get the guess
-            print!("Data: {:?}", data);
             let guess = String::from_utf8(data[1..].to_vec()).unwrap();
-            println!("Player {} guessed {}", id, guess);
+            // println!("Player {} guessed {}", id, guess);
             let mut color_vec = state.lock().unwrap().get_color_vec(guess.clone());
-            print!("Color vec: {:?}", color_vec);
+            print!("Opponent's Guess: {:?}\n", color_vec);
+            io::stdout().flush().unwrap();
             //TODO: UPDATE OPPONENT GAME DANCE
             return true;
         },
         x if x == MessageType::EndEvent as u8 => {
             let id = data[0];
-            let num_guesses = data[1];
-            println!("Player {} finished with {} guesses", id, num_guesses);
             state.lock().unwrap().set_game_over(true);
             if (id == state.lock().unwrap().get_id() as u8) {
                 println!("You won!");
@@ -2530,8 +2528,6 @@ fn main() -> Result<(), ErrorKind> {
     let state_cpy = state.clone();
     
     let _game_thread = thread::spawn(move || {
-        
-        let mut word_guess = String::new();
         while state_cpy.lock().unwrap().get_ready() == false {
             println!("Are you ready? (y/n)");
             let mut input = String::new();
@@ -2551,7 +2547,9 @@ fn main() -> Result<(), ErrorKind> {
             break;
         }
         println!("Guess a letter");
+        let mut word_guess = String::new();
         std::io::stdin().read_line(&mut word_guess).expect("Failed to read line");
+        word_guess = word_guess.trim().to_string();
         game_cpy.lock().unwrap().guess(&word_guess);
         let mut word_vec = word_guess.chars().collect::<Vec<char>>().iter().map(|c| *c as u8).collect::<Vec<_>>();
         let mut payload = vec![state_cpy.lock().unwrap().get_id() as u8];
@@ -2560,16 +2558,12 @@ fn main() -> Result<(), ErrorKind> {
         game_cpy.lock().unwrap().print_word();
 
         if game_cpy.lock().unwrap().check_win() {
-            println!("You win!");
-            // print id
             let id = state_cpy.lock().unwrap().get_id();
-            println!("Your id is {}", id);
             send_packet(&sender_cpy, server_address, MessageType::FinishEvent, vec![state_cpy.lock().unwrap().get_id()]);
             break;
         }
         if game_cpy.lock().unwrap().check_lose() {
             send_packet(&sender_cpy, server_address, MessageType::LoseEvent, vec![state_cpy.lock().unwrap().get_id()]);
-            println!("You lose!");
             break;
         }
         
