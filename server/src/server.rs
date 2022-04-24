@@ -116,19 +116,15 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
             if state.players_ready.len() == MAX_PLAYERS {
                 println!("Starting game");
                 state.start_game();
-                let index: u8 = rand::thread_rng().gen_range(0..254);
-                //send start event with word to all players from  hashmap
+                let index: u8 = rand::thread_rng().gen_range(0..255);
                 for (&player_address, _) in state.address_to_id.iter() {
-                    //TODO: ADD LOGIC FOR GETTING WORD
-                    //get random number for index of word
-                    
                     send_packet(sender, player_address, MessageType::StartEvent, vec![index]);
                 }
             }
         },
         x if x == MessageType::GuessEvent as u8 => {
             let id = data[0];
-            let mut guess = &data[1..];
+            let guess = &data[1..];
             let address = state.id_to_address.get(&id).unwrap();
             let mut payload = vec![id];
             payload.extend(guess);
@@ -141,19 +137,15 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
         },
         x if x == MessageType::FinishEvent as u8 => {
             let id = data[0];
-            // let num_guesses = payload[1];
-            // let address = state.id_to_address.get(&id).unwrap();
-            print!("Player {} finished", id);
+            println!("Player {} won", id);
             state.end_game();
-            //send won event to all players, but send lost event to other player
-            // TODO: ADD LOGIC TO SEE WHO GUESSED IT IN LESS WORDS
             for (&player_address, _) in state.address_to_id.iter() {
                     send_packet(sender, player_address, MessageType::EndEvent, vec![id]);
             }
         },
         x if x == MessageType::LoseEvent as u8 => {
             let id = data[0];
-            let winning_id = if (id == 0) {1} else{0};
+            let winning_id = if id == 0 {1} else{0};
             // let num_guesses = payload[1];
             // let address = state.id_to_address.get(&id).unwrap();
             print!("Player {} lost", id);
@@ -179,8 +171,10 @@ pub fn server() -> Result<(), ErrorKind> {
         heartbeat_interval: Some(time::Duration::from_millis(10)),
         ..Config::default()
     };
+
     let mut socket = Socket::bind_with_config("127.0.0.1:8000", config).unwrap();
-    
+    println!("Listening on 127.0.0.1:8000");
+
     let (sender, receiver) = (
         socket.get_packet_sender(), socket.get_event_receiver());
     
@@ -190,7 +184,6 @@ pub fn server() -> Result<(), ErrorKind> {
         if let Ok(event) = receiver.try_recv() {
             match event {
                 SocketEvent::Connect(address) => {
-                    //send heartbeat
                     send_packet(&sender, address, MessageType::Heartbeat, vec![]);
                     println!("Client {} connected", address);
                 },

@@ -1,6 +1,4 @@
 use std::{collections::HashMap, io};
-use core::time;
-use shared::PlayerId;
 use std::io::Write;
 struct Letter {
     guessed: bool,
@@ -43,7 +41,7 @@ impl Feudle {
 
     //guess func take word 
     pub fn guess(&mut self, word_guess: &String) -> bool {
-        let mut upper_case_word_guess = word_guess.to_ascii_uppercase();
+        let upper_case_word_guess = word_guess.to_ascii_uppercase();
         self.guess = upper_case_word_guess.clone();
         for ch in upper_case_word_guess.chars() {
             //check if an alphabet
@@ -93,7 +91,7 @@ impl Feudle {
         io::stdout().flush().unwrap();
     }
 
-    pub fn update(&mut self, should_update : bool) {
+    // pub fn update(&mut self, should_update : bool) {
         
-    }
+    // }
 }
