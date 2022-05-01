@@ -154,8 +154,7 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
             //send won event to all players, but send lost event to other player
             for (&player_address, _) in state.address_to_id.iter() {
                 send_packet(sender, player_address, MessageType::EndEvent, vec![winning_id]);
-        }
-
+            }
         },
         x  if x == MessageType::Heartbeat as u8 => {
             // println!("Heartbeat from {}", address);
@@ -171,9 +170,8 @@ pub fn server() -> Result<(), ErrorKind> {
         heartbeat_interval: Some(time::Duration::from_millis(10)),
         ..Config::default()
     };
-
-    let mut socket = Socket::bind_with_config("127.0.0.1:8000", config).unwrap();
-    println!("Listening on 127.0.0.1:8000");
+    let mut socket = Socket::bind_with_config("192.168.0.102:8000", config).unwrap();
+    println!("Listening on 192.168.0.102:8000");
 
     let (sender, receiver) = (
         socket.get_packet_sender(), socket.get_event_receiver());

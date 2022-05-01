@@ -1,5 +1,4 @@
-use std::{collections::HashMap, io};
-use std::io::Write;
+use std::{collections::HashMap};
 struct Letter {
     guessed: bool,
     in_word: bool,
@@ -77,19 +76,19 @@ impl Feudle {
         return false;
     }
 
-    pub fn print_word(&self) {
-        for letter in self.word.chars() {
-            let cap = letter.to_ascii_uppercase();
-            let alpha = self.letter_map.get(&letter).unwrap();
-            if alpha.in_position {
-                print!("{}", cap);
-            } else {
-                print!("_");
-            }
-        }
-        println!("");
-        io::stdout().flush().unwrap();
-    }
+    // pub fn print_word(&self) {
+    //     for letter in self.word.chars() {
+    //         let cap = letter.to_ascii_uppercase();
+    //         let alpha = self.letter_map.get(&letter).unwrap();
+    //         if alpha.in_position {
+    //             print!("{}", cap);
+    //         } else {
+    //             print!("_");
+    //         }
+    //     }
+    //     println!("");
+    //     io::stdout().flush().unwrap();
+    // }
 
     // pub fn update(&mut self, should_update : bool) {
         
