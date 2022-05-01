@@ -7,11 +7,13 @@ edition = "2021"
 laminar = "0.3"
 crossbeam-channel = "0.3.9"
 rand = "0.8.0"
+local-ip-address = "0.4.4"
+colored = "2.0"
+
 serde = { version = "1.0", features = ["derive"] }
 rocket = "0.5.0-rc.1"
 rocket_contrib = "0.4"
 serde_json = "1.0"
-local-ip-address = "0.4.4"
-colored = "2.0"
+
 shared = { path = "../shared" }
 resource = { path = "../resource" }

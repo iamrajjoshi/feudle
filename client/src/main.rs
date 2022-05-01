@@ -1,11 +1,13 @@
+
+#[macro_use] extern crate rocket;
+
 mod client;
 mod feudle;
-use rocket_contrib::json::Json;
-use rocket::response::content;
-use rocket::{Config};
+// use rocket_contrib::json::Json;
+// use rocket::response::content;
+// use rocket::{Config};
 use rocket::fs::{relative, FileServer};
 use std::thread;
-#[macro_use] extern crate rocket;
 
 
 

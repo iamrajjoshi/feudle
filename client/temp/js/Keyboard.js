@@ -132,8 +132,7 @@ const Keyboard = {
                         this.properties.value += "\n";
                         if(box == 6) {
                             compare_words(word, c_word, line);
-                            let s = "http://127.0.0.1:8000/".concat(word);
-                            console.log("HERE");
+                            let s = "http://192.168.0.102:8000/".concat(word);
                             console.log(word);
                             //
                             fetch(s)
