@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+hr.solid {
+    margin-top: -4px;
+    border-top: 8px solid rgb(7, 1, 1);
+}
+
+.font-center {
+    margin-top: 20px;text-align: right;font-family: 'Fredoka', sans-serif;font-size: 30px;margin-right: 45vw;
+}
+.f {
+    font-family: 'Fredoka', sans-serif; font-size: 20px;
+}
+.st {
+}
+.body-boxes {
+    margin-top: -260px; margin-left: 38vw; margin-right: 35vw; float: left;
+}
+.body-boxes2 {
+    margin-left: 80vw;
+    height: 100px;
+}
+
+.lines {
+    margin: 2px;height: 70px;
+}
+
+.lines2 {
+    margin: 1px; height: 47px;
+}
+
+.box {
+    border: 0.1px solid black; margin: 4px; height: 55px; width: 59px; float: left; display: inline-flex; align-items: center; justify-content: center; vertical-align: top; text-size-adjust: 40px;
+    /*box-shadow: 2px 2px 2px 2px #888888;*/
+
+}
+
+.box2 {
+    border: 0.1px solid black; margin: 2px; height: 40px; width: 44px; float: left; text-size-adjust: 20px;
+    /*box-shadow: 2px 2px 2px 2px #888888;*/
+}

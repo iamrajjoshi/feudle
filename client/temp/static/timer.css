@@ -1,0 +1,232 @@
+@import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz:200,300,400);
+@import url('https://fonts.googleapis.com/css2?family=Fredoka&display=swap');
+
+
+
+.my_timer {
+  font-family: 'Fredoka', sans-serif;
+  float:left;
+  font-size: 50px;
+  margin-left: 50px;
+  margin-top: 25px;
+}
+
+.timer-group {
+  height: 2px;
+  margin: 0 auto;
+  position: relative;
+  width: 200px;
+  color: rgb(211, 197, 197);
+  float: left;
+  margin-left: 20px;
+  margin-top: 15px;
+  font-size-adjust: 0.1;
+
+}
+
+.timer {
+  border-radius: 50%;
+  height: 50px;
+  overflow: hidden;
+  position: absolute;
+  width: 50px;
+  background: rgb(247, 245, 245) url(https://codepen.io/images/classy_fabric.png);
+
+}
+
+.timer:after {
+  background: #111 url(https://codepen.io/images/classy_fabric.png);
+  border-radius: 50%;
+  content: "";
+  display: block;
+  height: 80px;
+  left: 10px;
+  position: absolute;
+  width: 80px;
+  top: 10px;
+}
+
+.timer .hand {
+  float: left;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  width: 50%;
+}
+
+.timer .hand span {
+  border: 50px solid rgba(0, 0, 0, 0.4);
+  border-bottom-color: transparent;
+  border-left-color: transparent;
+  border-radius: 50%;
+  display: block;
+  height: 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  transform: rotate(225deg);
+  width: 0;
+}
+
+.timer .hand:first-child {
+  transform: rotate(180deg);
+}
+
+.timer .hand span {
+  animation-duration: 4s;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+.timer .hand:first-child span {
+  animation-name: spin1;
+}
+
+.timer .hand:last-child span {
+  animation-name: spin2;
+}
+
+
+
+.timer.minute {
+  background: rgba(0, 0, 0, .2);
+  height: 350px;
+  left: 25px;
+  width: 350px;
+  top: 25px;
+}
+
+.timer.minute .hand span {
+  animation-duration: 60s;
+  border-top-color: rgba(248, 37, 0, 0.4);
+  border-right-color:rgba(248, 37, 0, 0.4);
+  border-width: 175px;
+}
+
+.timer.minute:after {
+  height: 310px;
+  left: 20px;
+  width: 310px;
+  top: 20px;
+}
+
+.timer.second {
+  background: rgba(173, 42, 42, 0.2);
+  height: 300px;
+  left: 50px;
+  width: 300px;
+  top: 50px;
+}
+
+.timer.second .hand span {
+  animation-duration: 1s;
+  border-top-color: rgba(255, 255, 255, .15);
+  border-right-color: rgba(255, 255, 255, .15);
+  border-width: 150px;
+}
+
+.timer.second:after {
+  height: 296px;
+  left: 2px;
+  width: 296px;
+  top: 2px;
+}
+
+.face {
+  background: rgba(255, 255, 255, 0);
+  border-radius: 60%;
+  height: 240px;
+  left: 52px;
+  padding: 165px 40px 0;
+  position: absolute;
+  width: 296px;
+  text-align: center;
+  top: 52px;
+}
+
+.face h2 {
+  font-weight: 200; 
+}
+
+.face p {
+  border-radius: 20px;
+  font-size: 76px;
+  font-weight: 200;
+  position: absolute;
+  top: 17px;
+  width: 260px;
+  left: 20px;
+}
+
+@keyframes spin1 {
+  0% {
+    transform: rotate(225deg);
+  }
+  50% {
+    transform: rotate(225deg);
+  }
+  100% {
+    transform: rotate(405deg);
+  }
+}
+
+@keyframes spin2 {
+  0% {
+    transform: rotate(225deg);
+  }
+  50% {
+    transform: rotate(405deg);
+  }
+  100% {
+    transform: rotate(405deg);
+  }
+}
+
+.wrapper {
+  padding-top: 100px;
+  width: 300px;
+  height: 30px;
+  margin-top: 40px;
+  margin-left: 100px;
+  position: relative;
+  overflow: hidden;
+  float: left;
+}
+
+.main-element {
+  position: absolute;
+  top: 1%;
+  left: 1%;
+  display: block;
+  height: 94%;
+  width: 98%;
+  margin: auto;
+  align-self: center;
+  background: rgb(228, 250, 252);
+  z-index: 1;
+}
+
+.border {
+  position: absolute;
+  display: block;
+  top: -50%;
+  left: -50%;
+  z-index: -9;
+  display: block;
+  height: 200%;
+  width: 200%;
+  transform: rotate(-45deg);
+  overflow: hidden;
+  background: linear-gradient(to right, #fff 20%, #fff 40%, #ee6d6d 50%, #ee6d6d 50%, #fff 70%, #fff 100%);
+  background-size: 200% auto;
+  
+  animation: shine 3s linear infinite;
+}
+
+/*Begin shimmer code*/
+
+@keyframes shine {
+    to {
+      background-position: 200% center;
+    }
+  }

@@ -272,5 +272,4 @@ pub fn client() {
         Err(e) => println!("{:?}", e),
         _ => ()
     }
-    
 }
