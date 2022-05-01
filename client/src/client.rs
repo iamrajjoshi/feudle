@@ -10,13 +10,19 @@ use std::sync::{Arc, Mutex};
 use core::time;
 use std::io::Write;
 use local_ip_address::local_ip;
+use colored::*;
+use std::collections::HashSet;
 use resource::get_word;
+use resource::get_dictionary;
 struct ClientState {
     id: PlayerId,
     ready: bool,
     game_started: bool,
     game_over: bool,
     word: String,
+    dictionary: Vec<String>,
+    guessed_letters: HashSet<char>,
+    guesses: Vec<String>,
 }
 
 impl  ClientState {
@@ -27,6 +33,9 @@ impl  ClientState {
             game_started: false,
             game_over: false,
             word: String::new(),
+            dictionary: get_dictionary(),
+            guessed_letters: HashSet::new(),
+            guesses: Vec::new(),
         }
     }
 
@@ -66,6 +75,35 @@ impl  ClientState {
         self.word = word;
     }
 
+    fn display_guesses(&mut self) {
+        self.guesses.iter().enumerate().for_each(|(guess_number, guess)| {
+            print!("{}: ", guess_number+1);
+            guess.chars().enumerate().for_each(|(pos, c)| {
+                let display = if self.word.chars().nth(pos).unwrap() == c {
+                    format!("{c}").bright_green()
+                } else if self.word.chars().any(|wc| wc == c) {
+                    format!("{c}").bright_yellow()
+                } else {
+                    self.guessed_letters.insert(c);
+                    format!("{c}").red()
+                };
+                print!("{display}");
+            });
+            println!();
+        });
+        io::stdout().flush().unwrap();
+    }
+
+    fn display_invalid_letters(&self) {
+        if !self.guessed_letters.is_empty() {
+            print!("Letters not in the word: ");
+            self.guessed_letters.iter()
+                .for_each(|letter| print!("{letter} "));
+            println!();
+        }
+        io::stdout().flush().unwrap();
+    }
+
     pub fn get_color_vec(&self, guess: String) -> Vec<char> {
         let uppercase_guess = guess.to_uppercase();
         let mut color_vec = Vec::new();
@@ -81,6 +119,27 @@ impl  ClientState {
             }
         }
         color_vec
+    }
+
+    pub fn check_guess(&mut self, guess: String) -> bool{
+        let lowercase_guess = guess.to_lowercase();
+        if lowercase_guess.len() != 5 {
+            println!("Guess must be 5 letters long");
+            return false;
+        }
+        if self.guesses.contains(&lowercase_guess) {
+            println!("You already guessed that word");
+            return false;
+        }
+        if !self.dictionary.contains(&lowercase_guess) {
+            println!("That word is not in the dictionary");
+            return false;
+        }
+        return true;
+    }
+    
+    pub fn set_guess(&mut self, guess: String) {
+        self.guesses.push(guess.to_uppercase());
     }
 }
 
@@ -133,7 +192,20 @@ fn handle_packet(packet: &Packet, game: Arc<Mutex<Feudle>>, state: Arc<Mutex<Cli
             let guess = String::from_utf8(data[1..].to_vec()).unwrap();
             // println!("Player {} guessed {}", id, guess);
             let color_vec = state.lock().unwrap().get_color_vec(guess.clone());
-            print!("Opponent's Guess: {:?}\n", color_vec);
+            // print!("Opponent's Guess: {:?}\n", color_vec);
+            print!("Opponent's Guess: ");
+            let mut display: ColoredString;
+            for (_i, c) in color_vec.iter().enumerate() {
+                if *c == 'G' {
+                    display = format!("{c}").bright_green();
+                } else if *c == 'Y' {
+                    display = format!("{c}").bright_yellow();
+                } else {
+                    display = format!("{c}").red();
+            }
+                print!("{display}");
+            }
+            println!();
             io::stdout().flush().unwrap();
             //TODO: UPDATE OPPONENT GAME DANCE
             return true;
@@ -223,16 +295,26 @@ fn main() -> Result<(), ErrorKind> {
             println!("Game over!");
             break;
         }
-        println!("Guess a letter");
-        let mut word_guess = String::new();
-        std::io::stdin().read_line(&mut word_guess).expect("Failed to read line");
-        word_guess = word_guess.trim().to_string();
+        
+        let mut word_guess;
+        loop {
+            word_guess = String::new();
+            println!("Guess a word");
+            std::io::stdin().read_line(&mut word_guess).expect("Failed to read line");
+            word_guess = word_guess.trim().to_string();
+            if state_cpy.lock().unwrap().check_guess(word_guess.clone()) {
+                break;
+            }
+        }
+
+        state_cpy.lock().unwrap().set_guess(word_guess.clone());
         game_cpy.lock().unwrap().guess(&word_guess);
+        
         let mut word_vec = word_guess.chars().collect::<Vec<char>>().iter().map(|c| *c as u8).collect::<Vec<_>>();
         let mut payload = vec![state_cpy.lock().unwrap().get_id() as u8];
         payload.append(&mut word_vec);
         send_packet(&sender_cpy, server_address, MessageType::GuessEvent, payload);
-        game_cpy.lock().unwrap().print_word();
+        // game_cpy.lock().unwrap().print_word();
 
         if game_cpy.lock().unwrap().check_win() {
             // let id = state_cpy.lock().unwrap().get_id();
@@ -243,7 +325,8 @@ fn main() -> Result<(), ErrorKind> {
             send_packet(&sender_cpy, server_address, MessageType::LoseEvent, vec![state_cpy.lock().unwrap().get_id()]);
             break;
         }
-        
+        state_cpy.lock().unwrap().display_guesses();
+        state_cpy.lock().unwrap().display_invalid_letters();
         // std::thread::sleep(time::Duration::from_millis(10));
     }
     });
