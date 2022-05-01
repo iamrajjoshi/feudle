@@ -181,7 +181,7 @@ fn handle_packet(packet: &Packet, game: Arc<Mutex<Feudle>>, state: Arc<Mutex<Cli
         x if x == MessageType::StartEvent as u8 => {
             let index = data[0];
             let word = get_word(index as usize);
-            println!("Starting game with word {}", word);
+            // println!("Starting game with word {}", word);
             game.lock().unwrap().set_word(word.clone());
             state.lock().unwrap().set_word(word.to_uppercase());
             state.lock().unwrap().set_game_started(true);
@@ -319,15 +319,17 @@ fn main() -> Result<(), ErrorKind> {
         if game_cpy.lock().unwrap().check_win() {
             // let id = state_cpy.lock().unwrap().get_id();
             send_packet(&sender_cpy, server_address, MessageType::FinishEvent, vec![state_cpy.lock().unwrap().get_id()]);
+            std::thread::sleep(time::Duration::from_millis(20000));
             break;
         }
         if game_cpy.lock().unwrap().check_lose() {
             send_packet(&sender_cpy, server_address, MessageType::LoseEvent, vec![state_cpy.lock().unwrap().get_id()]);
+            std::thread::sleep(time::Duration::from_millis(20000));
             break;
         }
         state_cpy.lock().unwrap().display_guesses();
         state_cpy.lock().unwrap().display_invalid_letters();
-        // std::thread::sleep(time::Duration::from_millis(10));
+        
     }
     });
     
