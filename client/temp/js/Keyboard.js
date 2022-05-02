@@ -5834,6 +5834,7 @@ const Keyboard = {
         };
 
         document.addEventListener("keyup", function(event) {
+            if (c_word != "") {
             switch (event.code) {
                 case "Enter":
                     if(box == 6) {
@@ -5868,6 +5869,7 @@ const Keyboard = {
                         word += k.charAt(k.length-1);
                     }
                     break;
+                }
 
             }
         });
@@ -5878,13 +5880,13 @@ const Keyboard = {
             // Add attributes/classes
             keyElement.setAttribute("type", "button");
             keyElement.classList.add("keyboard__key");
-
             switch (key) {
                 case "backspace":
                     keyElement.classList.add("keyboard__key--wide");
                     keyElement.innerHTML = createIconHTML("backspace");
 
                     keyElement.addEventListener("click", () => {
+                        if (c_word != "") {
                         this.properties.value = this.properties.value.substring(0, this.properties.value.length - 1);
                         if(box > 1) box--;
                         const s = "line" + line.toString() + "box" + box.toString();
@@ -5892,7 +5894,7 @@ const Keyboard = {
                         document.getElementById(s).style.border = "0.1px solid black";
                         document.getElementById(s).style.margin = "4px";
 
-
+                        }
                     });
 
                     break;
@@ -5921,6 +5923,7 @@ const Keyboard = {
                     keyElement.textContent = key.toUpperCase();
 
                     keyElement.addEventListener("click", () => {
+                        if (c_word != "") {
                         this.properties.value += key.toUpperCase();
                         const s = "line" + line.toString() + "box" + box.toString();
                         document.getElementById(s).innerHTML +=`<div>${key.toUpperCase()}</div><br />`;
@@ -5930,7 +5933,7 @@ const Keyboard = {
                             box++;
                             word += key.toUpperCase();
                         }
-
+                    }
                     });
 
                     break;
@@ -5948,20 +5951,37 @@ const Keyboard = {
 
 };
 
+function get_answer() {
+    
+    return data;
+}
+
 window.addEventListener("DOMContentLoaded", function () {
     console.log("START");
-
-    let s = "http://127.0.0.1:8000/guess/hello";
-    //
-    fetch(s)
-        .then(function(response) {
-            return response.text().then(function(text) {
-                c_word = text;
-            });
-        })
-        .catch(err => console.log('Request Failed', err));
-    //
-    subscribe("/events");
+        var ready = document.getElementById("ready");
+        var m = document.getElementById("Ready");
+        ready.onclick = function() {
+        
+            let s = "http://127.0.0.1:8000/ready";
+            //
+            fetch(s).then(response => console.log("READY"));
+        
+            m.style.display = "none";
+            tick();
+            var min = document.getElementById("min");
+            var sec = document.getElementById("sec");
+            min.style.animationName = "spin1";
+            sec.style.animationName = "spin2";
+        
+            
+        
+        }
+        //
+    // subscribe("/events");
+    // c_word = get_answer();
+    const response = fetch("http://127.0.0.1:8000/answer").then(response => response.text().then(text => c_word = text));
+    // console.log(response.text());
+    // c_word = await response.text();
     Keyboard.init();
 });
 
@@ -6042,19 +6062,7 @@ btn.onclick = function() {
   }
 }
 
-var ready = document.getElementById("ready");
-var m = document.getElementById("Ready");
-ready.onclick = function() {
-    m.style.display = "none";
-    tick();
-    var min = document.getElementById("min");
-    var sec = document.getElementById("sec");
-    min.style.animationName = "spin1";
-    sec.style.animationName = "spin2";
 
-
-
-}
 
 //TIMER---------------------------------------------------------------------------------------------------
 
@@ -6099,32 +6107,23 @@ function tick() {
   requestAnimationFrame(tick);
 
 }
+// const events = new EventSource("/events");
+  
+// events.addEventListener("message", (ev) => {
+// console.log("raw data", ev.data);
+// word2 = ev.data;
+// compare_words(word2, c_word, line2, "2");
+// line2++;
+// if(line2 == 7) events.close();
+// //console.log("decoded data", JSON.stringify(JSON.parse(ev.data)));
+// });
 
+// events.addEventListener("open", () => {
+// //setConnectedStatus(true);
+// console.log(`connected to event stream at ${uri}`);
+// });
 
-function subscribe(uri) {
-    
-    function connect(uri) {
-      const events = new EventSource(uri);
-  
-      events.addEventListener("message", (ev) => {
-        console.log("raw data", ev.data);
-        word2 = ev.data;
-        compare_words(word2, c_word, line2, "2");
-        line2++;
-        if(line2 == 7) events.close();
-        //console.log("decoded data", JSON.stringify(JSON.parse(ev.data)));
-      });
-  
-      events.addEventListener("open", () => {
-        //setConnectedStatus(true);
-        console.log(`connected to event stream at ${uri}`);
-      });
-  
-      events.addEventListener("error", () => {
-        //setConnectedStatus(false);
-        events.close();
-      });
-    }
-  
-    connect(uri);
-  }
+// events.addEventListener("error", () => {
+// //setConnectedStatus(false);
+// events.close();
+// });

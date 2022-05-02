@@ -1,7 +1,9 @@
 
 #[macro_use] extern crate rocket;
-use crate::client::foo;
-use crate::client::events;
+// use crate::client::events;
+use crate::client::answer;
+// use crate::client::events;
+use crate::client::ready;
 mod client;
 mod feudle;
 // use rocket_contrib::json::Json;
@@ -20,15 +22,14 @@ use std::thread;
 
 #[launch]
 fn rocket() -> _ {
-    thread::spawn(move || { 
-        
+    thread::spawn(move || {    
         client::client();});
     // let config = 
     // .address("1.2.3.4".into())
     // .port(9234);
 
     rocket::build()
-        .mount("/", routes![foo,events])
+        .mount("/", routes![ ready, answer])
         .mount("/", FileServer::from(relative!("temp"))) // to host the html file. 
     
 }
