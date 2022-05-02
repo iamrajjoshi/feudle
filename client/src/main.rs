@@ -12,15 +12,18 @@ use std::thread;
 
 
 
-#[get("/<word>")]
+#[get("/guess/<word>")]
 fn foo(word : &str) -> String {
-    println!("{}", word.to_string());
-    word.to_string()
+    "alert".to_string()
 }
+
+
 
 #[launch]
 fn rocket() -> _ {
-    thread::spawn(move || { client::client();});
+    thread::spawn(move || { 
+        
+        client::client();});
     // let config = 
     // .address("1.2.3.4".into())
     // .port(9234);
