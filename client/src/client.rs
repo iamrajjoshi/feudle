@@ -49,16 +49,16 @@ pub fn ready() -> String {
     "ready".to_string()
 }
 
-// #[get("/events")]
-// pub fn events() -> String {    
-//     loop {
-//         let ten_millis = time::Duration::from_millis(10000);
-//         thread::sleep(ten_millis);
-//         let num = rand::thread_rng().gen_range(0..100);
-//         let word = get_word(num);
-//         word.to_string();
-//     }
-// }
+#[get("/events")]
+pub async fn events() -> EventStream![] {    
+    EventStream! {
+        let ten_millis = time::Duration::from_millis(2000);
+        thread::sleep(ten_millis);
+        let num = rand::thread_rng().gen_range(0..100);
+        let word = get_word(num);
+        yield Event::data(word);
+    }
+}
 struct ClientState {
     id: PlayerId,
     ready: bool,

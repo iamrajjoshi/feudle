@@ -5983,6 +5983,21 @@ window.addEventListener("DOMContentLoaded", function () {
     // console.log(response.text());
     // c_word = await response.text();
     Keyboard.init();
+
+    const events = new EventSource("/events");
+  
+    events.addEventListener("message", (ev) => {
+        console.log("raw data", ev.data);
+        word2 = ev.data;
+        compare_words(word2, c_word, line2, "2");
+        line2++;
+        if(line2 == 7) events.close();
+        //console.log("decoded data", JSON.stringify(JSON.parse(ev.data)));
+    });
+
+    events.addEventListener("open", () => {
+        console.log(`connected to event stream at ${uri}`);
+    });
 });
 
 function compare_words(w, a, line, num) {

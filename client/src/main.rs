@@ -2,7 +2,7 @@
 #[macro_use] extern crate rocket;
 // use crate::client::events;
 use crate::client::answer;
-// use crate::client::events;
+use crate::client::events;
 use crate::client::ready;
 mod client;
 mod feudle;
@@ -29,7 +29,7 @@ fn rocket() -> _ {
     // .port(9234);
 
     rocket::build()
-        .mount("/", routes![ ready, answer])
+        .mount("/", routes![ ready, events, answer])
         .mount("/", FileServer::from(relative!("temp"))) // to host the html file. 
     
 }
