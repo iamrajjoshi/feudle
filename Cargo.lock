@@ -319,6 +319,7 @@ dependencies = [
  "colored",
  "crossbeam-channel",
  "laminar",
+ "lazy_static",
  "local-ip-address",
  "rand 0.8.5",
  "resource",

@@ -1,7 +1,13 @@
 var line = 1;
 var box = 1;
 var word = "";
+
 var c_word = "";
+
+
+var word2 = "";
+var line2 = 1;
+var box2 = 1;
 
 // WORD LIST -------------------
 
@@ -5833,7 +5839,7 @@ const Keyboard = {
                     if(box == 6) {
                         let temp_word = word.toLowerCase();
                         if (WORDS.includes(temp_word)) {
-                                compare_words(word, c_word, line);
+                                compare_words(word, c_word, line, "");
                                 line++;
                                 box = 1;
                                 word = "";
@@ -5900,7 +5906,7 @@ const Keyboard = {
                         if(box == 6) {
                             let temp_word = word.toLowerCase();
                             if (WORDS.includes(temp_word)) {
-                                    compare_words(word, c_word, line);
+                                    compare_words(word, c_word, line, "");
                                     line++;
                                     box = 1;
                                     word = "";
@@ -5955,11 +5961,11 @@ window.addEventListener("DOMContentLoaded", function () {
         })
         .catch(err => console.log('Request Failed', err));
     //
-
+    subscribe("/events");
     Keyboard.init();
 });
 
-function compare_words(w, a, line) {
+function compare_words(w, a, line, num) {
     var word = w.toLowerCase();
     var ans = a.toLowerCase();
     console.log()
@@ -5968,18 +5974,18 @@ function compare_words(w, a, line) {
     var count = 0;
     for(var i = 0; i < 5; i++) {
         if(word[i] == ans[i]) {
-            change_color_green(i+1, line);
+            change_color_green(i+1, line, num);
             count++;
         }
         else {
             var flag = 0;
             for(var j = 0; j < 5 ; j++) {
                 if(i!=j && word[i] == ans[j]) {
-                    change_color_yellow(i+1, line);
+                    change_color_yellow(i+1, line, num);
                     flag = 1;
                 }
             }
-            if(flag == 0) change_color_grey(i+1,line);
+            if(flag == 0) change_color_grey(i+1,line, num);
         }
     }
     if(count == 5) {
@@ -5987,16 +5993,16 @@ function compare_words(w, a, line) {
     }
 }
 
-function change_color_green(box, line) {
-    const s3 = "line" + line.toString() + "box" + box.toString();
+function change_color_green(box, line, num) {
+    const s3 = num + "line" + line.toString() + "box" + box.toString();
     document.getElementById(s3).style.backgroundColor = "#46a842";
 }
-function change_color_grey(box, line) {
-    const s3 = "line" + line.toString() + "box" + box.toString();
+function change_color_grey(box, line, num) {
+    const s3 = num + "line" + line.toString() + "box" + box.toString();
     document.getElementById(s3).style.backgroundColor = "#5f6870";
 }
-function change_color_yellow(box, line) {
-    const s3 = "line" + line.toString() + "box" + box.toString();
+function change_color_yellow(box, line, num) {
+    const s3 = num + "line" + line.toString() + "box" + box.toString();
     document.getElementById(s3).style.backgroundColor = "#c1cc5c";
 }
 
@@ -6091,5 +6097,34 @@ function tick() {
   face.innerText = parts.join(':');
   
   requestAnimationFrame(tick);
-  
+
 }
+
+
+function subscribe(uri) {
+    
+    function connect(uri) {
+      const events = new EventSource(uri);
+  
+      events.addEventListener("message", (ev) => {
+        console.log("raw data", ev.data);
+        word2 = ev.data;
+        compare_words(word2, c_word, line2, "2");
+        line2++;
+        if(line2 == 7) events.close();
+        //console.log("decoded data", JSON.stringify(JSON.parse(ev.data)));
+      });
+  
+      events.addEventListener("open", () => {
+        //setConnectedStatus(true);
+        console.log(`connected to event stream at ${uri}`);
+      });
+  
+      events.addEventListener("error", () => {
+        //setConnectedStatus(false);
+        events.close();
+      });
+    }
+  
+    connect(uri);
+  }

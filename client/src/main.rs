@@ -1,6 +1,7 @@
 
 #[macro_use] extern crate rocket;
-
+use crate::client::foo;
+use crate::client::events;
 mod client;
 mod feudle;
 // use rocket_contrib::json::Json;
@@ -8,15 +9,13 @@ mod feudle;
 // use rocket::{Config};
 use rocket::fs::{relative, FileServer};
 use std::thread;
-
-
-
-
-#[get("/guess/<word>")]
-fn foo(word : &str) -> String {
-    "alert".to_string()
-}
-
+// use rocket::{State, Shutdown};
+// use rocket::form::Form;
+// use rocket::response::stream::{EventStream, Event};
+// use rocket::serde::{Serialize, Deserialize};
+// use rocket::tokio::sync::broadcast::{channel, Sender, error::RecvError};
+// use rocket::tokio::select;
+// use rocket::tokio::time::{self, Duration};
 
 
 #[launch]
@@ -29,7 +28,7 @@ fn rocket() -> _ {
     // .port(9234);
 
     rocket::build()
-        .mount("/", routes![foo])
+        .mount("/", routes![foo,events])
         .mount("/", FileServer::from(relative!("temp"))) // to host the html file. 
     
 }

@@ -14,6 +14,41 @@ use colored::*;
 use std::collections::HashSet;
 use resource::get_word;
 use resource::get_dictionary;
+use lazy_static::lazy_static;
+
+use rocket::{State, Shutdown};
+use rocket::form::Form;
+use rocket::response::stream::{EventStream, Event};
+use rocket::serde::{Serialize, Deserialize};
+use rocket::tokio::sync::broadcast::{channel, error::RecvError};
+use rocket::tokio::select;
+use rocket::tokio::time::{Duration};
+
+use rand::Rng;
+
+
+lazy_static! {
+    static ref WORD : Mutex<Vec<char>> = Mutex::new(vec![]);
+    static ref GUESS2 : Mutex<Vec<char>> = Mutex::new(vec![]);
+}
+
+#[get("/guess/<word>")]
+pub fn foo(word : &str) -> String {
+    WORD.lock().unwrap().iter().collect()
+}
+
+#[get("/events")]
+pub async fn events() -> EventStream![] {
+        EventStream! {
+            loop {
+                let ten_millis = time::Duration::from_millis(8000);
+                let num = rand::thread_rng().gen_range(0..100);
+                let word = get_word(num);
+                yield Event::data(word.to_string());
+                thread::sleep(ten_millis);
+            }
+        }
+}
 struct ClientState {
     id: PlayerId,
     ready: bool,
@@ -181,10 +216,12 @@ fn handle_packet(packet: &Packet, game: Arc<Mutex<Feudle>>, state: Arc<Mutex<Cli
         x if x == MessageType::StartEvent as u8 => {
             let index = data[0];
             let word = get_word(index as usize);
+
             // println!("Starting game with word {}", word);
             game.lock().unwrap().set_word(word.clone());
             state.lock().unwrap().set_word(word.to_uppercase());
             state.lock().unwrap().set_game_started(true);
+
             return true;
         },
         x if x == MessageType::GuessEvent as u8 => {
@@ -295,7 +332,9 @@ fn main() -> Result<(), ErrorKind> {
             println!("Game over!");
             break;
         }
-        
+        for c in state_cpy.lock().unwrap().word.to_string().chars() {
+            WORD.lock().unwrap().push(c);
+        }
         let mut word_guess;
         loop {
             word_guess = String::new();
