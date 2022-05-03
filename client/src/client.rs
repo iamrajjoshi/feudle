@@ -23,25 +23,25 @@ use rand::Rng;
 
 lazy_static! {
     static ref READY : Mutex<bool> = Mutex::new(false);
-    static ref ANSWER : Mutex<String> = Mutex::new(String::new());
+    static ref ANSWER : Mutex<String> = Mutex::new("".to_string());
     static ref GUESS : Mutex<String> = Mutex::new(String::new());
     static ref NEW_GUESS : Mutex<bool> = Mutex::new(false);
     static ref END_GAME: Mutex<String> = Mutex::new("-".to_string());
 }
 
 #[get("/end")]
-pub fn end() -> String {
+pub async fn end() -> String {
    let end_game =  &*END_GAME.lock().unwrap();
     end_game.to_string()
 }
 
 #[get("/answer")]
-pub fn answer() -> String {
-    loop {
-        if *ANSWER.lock().unwrap() != String::new() {
-            break;
-        }
-    }
+pub async fn answer() -> String {
+    // loop {
+    //     if *ANSWER.lock().unwrap() != String::new() {
+    //         break;
+    //     }
+    // }
     // std::thread::sleep(time::Duration::from_millis(10000));
     // *ANSWER.lock().unwrap()  = "tests".to_string();
     let answer = &*ANSWER.lock().unwrap();
@@ -50,7 +50,8 @@ pub fn answer() -> String {
 }
 
 #[get("/ready")]
-pub fn ready() -> String {
+pub async fn ready() -> String {
+    println!("{}", "ready".green());
     let mut ready = READY.lock().unwrap();
     *ready = true;
     "ready".to_string()

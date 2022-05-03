@@ -30,7 +30,6 @@ fn rocket() -> _ {
     // .port(9234);
 
     rocket::build()
-        .manage(channel::<String>(1024).0)
         .mount("/", routes![ end, ready, events, answer])
         .mount("/", FileServer::from(relative!("temp"))) // to host the html file. 
     

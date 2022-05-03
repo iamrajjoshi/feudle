@@ -5979,9 +5979,10 @@ window.addEventListener("DOMContentLoaded", function () {
         //
     // subscribe("/events");
     // c_word = get_answer();
-    const response = fetch("http://127.0.0.1:8000/answer").then(response => response.text().then(text => c_word = text));
+    //const response = fetch("http://127.0.0.1:8000/answer").then(response => response.text().then(text => c_word = text));
     // console.log(response.text());
     // c_word = await response.text();
+    answer(10000);
     Keyboard.init();
 
 
@@ -6022,8 +6023,9 @@ window.addEventListener("DOMContentLoaded", function () {
     //         })
     //         .catch(error => console.error(error.message));
 
-    guess2(10000);
-    end(10000);
+    //guess2(10000);
+    //end(10000);
+
 
 });
 
@@ -6179,6 +6181,16 @@ async function guess2(delay) {
                     compare_words(word2, c_word, line2, "2");
                 }
                 line2++;
+            })
+    );
+    setTimeout(() => guess2(delay), delay)
+}
+
+async function answer(delay) {
+    fetch("http://127.0.0.1:8000/answer").then(
+        response => response.text()
+            .then(text => {
+                c_word = text;
             })
     );
     setTimeout(() => guess2(delay), delay)
