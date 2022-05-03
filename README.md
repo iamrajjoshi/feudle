@@ -18,23 +18,13 @@
   - Allow players to connect to server and have the server control overall competition state while the clients control the game state
   - **Task List**
     - Client
-      - [ ] Receiving and updating game state
-      - [ ] Serializing and sending game state
-      - [ ] Seperate thread for game loop
+      - [x] Receiving and updating game state
+      - [x] Serializing and sending game state
+      - [x] Seperate thread for game loop
     - Server
-      - [ ] Handling client connections and disconnections
-      - [ ] Broadcast game state
-      - [ ] Determine when someone wins in a game
-* Frontend
-  
-  * Present a UI for our game including components such as virtual keyboard, timer, settings and bridge the backend.
-  
-  * **Task List**
-    
-    - [ ] Feudle word boxes with accurate color transformations on word submission
-    - [ ] Common timer for both the players
-    - [ ] Game room with a ready button, to synchronize the start of the game when both players are ready
-    - [ ] Virtual Keyboard attached at the bottom of the webpage
+      - [x] Handling client connections and disconnections
+      - [x] Broadcast game state
+      - [x] Determine when someone wins in a game
 
 #### Possible Challenges
 

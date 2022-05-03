@@ -166,12 +166,25 @@ fn handle_packet(sender: &Sender<Packet>, packet: &Packet, state: &mut ServerSta
 
 pub fn server() -> Result<(), ErrorKind> {
     let mut state = ServerState::new();
-    let config = Config {
+    // let config = Config {
+    //     heartbeat_interval: Some(time::Duration::from_millis(10)),
+    //     ..Config::default()
+    // };
+    // let mut  socket = Socket::bind_with_config("192.168.0.110:8001", config);
+    let mut socket = match Socket::bind_with_config("192.168.0.110:8001", Config {
         heartbeat_interval: Some(time::Duration::from_millis(10)),
         ..Config::default()
+    }) {
+        Ok(s) => s,
+        Err(_e) => {
+            Socket::bind_with_config("127.0.0.1:8080", Config {
+                heartbeat_interval: Some(time::Duration::from_millis(10)),
+                ..Config::default()
+            }).unwrap()
+        }
     };
-    let mut socket = Socket::bind_with_config("192.168.0.110:8001", config).unwrap();
-    println!("Listening on 192.168.0.110:8001");
+    // let mut socket = Socket::bind_with_config("192.168.0.110:8001", config).unwrap();
+    println!("Listening on {}", socket.local_addr().unwrap());
 
     let (sender, receiver) = (
         socket.get_packet_sender(), socket.get_event_receiver());

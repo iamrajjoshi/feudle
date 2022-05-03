@@ -258,7 +258,20 @@ fn main() -> Result<(), ErrorKind> {
     // socket = Socket::bind_with_config("127.0.0.1:8452", config).unwrap();
 
     // Tell server to add the client
-    let server_address = "192.168.0.110:8001".parse::<SocketAddr>().unwrap();
+    // get server address from user
+    let mut server_addr: String;
+    loop {
+        print!("Enter server address: ");
+        server_addr = String::new();
+        io::stdin().read_line(&mut server_addr).unwrap();
+        server_addr = server_addr.trim().to_string();
+        if server_addr.len() == 0 {
+            println!("Please enter a valid server address");
+        } else {
+            break;
+        }
+    }
+    let server_address = server_addr.parse::<SocketAddr>().unwrap();
     let (sender, receiver) = (
         socket.get_packet_sender(), socket.get_event_receiver());
     send_packet(&sender, server_address, MessageType::JoinEvent, vec![]);
