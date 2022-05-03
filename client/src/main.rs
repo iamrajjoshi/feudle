@@ -15,7 +15,7 @@ use std::thread;
 // use rocket::form::Form;
 // use rocket::response::stream::{EventStream, Event};
 // use rocket::serde::{Serialize, Deserialize};
-// use rocket::tokio::sync::broadcast::{channel, Sender, error::RecvError};
+use rocket::tokio::sync::broadcast::{channel, Sender, error::RecvError};
 // use rocket::tokio::select;
 // use rocket::tokio::time::{self, Duration};
 
@@ -29,6 +29,7 @@ fn rocket() -> _ {
     // .port(9234);
 
     rocket::build()
+        .manage(channel::<String>(1024).0)
         .mount("/", routes![ ready, events, answer])
         .mount("/", FileServer::from(relative!("temp"))) // to host the html file. 
     

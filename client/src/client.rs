@@ -50,14 +50,8 @@ pub fn ready() -> String {
 }
 
 #[get("/events")]
-pub async fn events() -> EventStream![] {    
-    EventStream! {
-        let ten_millis = time::Duration::from_millis(2000);
-        thread::sleep(ten_millis);
-        let num = rand::thread_rng().gen_range(0..100);
-        let word = get_word(num);
-        yield Event::data(word);
-    }
+pub async fn events() -> String {    
+    "TEASE".to_string()
 }
 struct ClientState {
     id: PlayerId,

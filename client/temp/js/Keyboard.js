@@ -5984,20 +5984,46 @@ window.addEventListener("DOMContentLoaded", function () {
     // c_word = await response.text();
     Keyboard.init();
 
-    const events = new EventSource("/events");
-  
-    events.addEventListener("message", (ev) => {
-        console.log("raw data", ev.data);
-        word2 = ev.data;
-        compare_words(word2, c_word, line2, "2");
-        line2++;
-        if(line2 == 7) events.close();
-        //console.log("decoded data", JSON.stringify(JSON.parse(ev.data)));
-    });
 
-    events.addEventListener("open", () => {
-        console.log(`connected to event stream at ${uri}`);
-    });
+    // const events = new EventSource("/events");
+
+    //     events.addEventListener("message", (ev) => {
+    //         console.log("raw data", ev.data);
+    //         word2 = ev.data;
+    //         compare_words(word2, c_word, line2, "2");
+    //         line2++;
+    //         if(line2 == 7) events.close();
+    //     });
+
+    //     events.addEventListener("open", () => {
+    //         console.log(`connected to event stream at ${uri}`);
+    //     });
+
+    // while(true) {
+    //     const response = fetch("http://127.0.0.1:8000/events").then(esponse => response.text().then(text => {
+    //         let word2 = text;
+    //         compare_words(word2, c_word, line2, "2");
+    //         line2++;
+    //     }));
+    //     if(line2 == 7) events.close();
+    // }
+
+    // const fetchPlus = (url, retry) =>
+    //     fetch(url, retry)
+    //         .then(res => {
+    //         if (res.ok) {
+    //             return res.text()
+    //         }
+    //         if(line2 == 7) throw new Error(res.status);
+    //         if (retries > 0) {
+    //             return fetchPlus(url, retries)
+    //         }
+    //         throw new Error(res.status)
+    //         })
+    //         .catch(error => console.error(error.message));
+
+    execute1(10000)
+
 });
 
 function compare_words(w, a, line, num) {
@@ -6142,3 +6168,15 @@ function tick() {
 // //setConnectedStatus(false);
 // events.close();
 // });
+
+async function execute1(delay) {
+    fetch("http://127.0.0.1:8000/events").then(
+        response => response.text()
+            .then(text => {
+                let word2 = text;
+                compare_words(word2, c_word, line2, "2");
+                line2++;
+            })
+    );
+    setTimeout(() => execute1(delay), delay)
+}
