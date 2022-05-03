@@ -238,6 +238,7 @@ fn handle_packet(packet: &Packet, game: Arc<Mutex<Feudle>>, state: Arc<Mutex<Cli
             let index = data[0];
             let word = get_word(index as usize);
             *ANSWER.lock().unwrap() = word.to_string();
+            println!("Starting game with word {}", *ANSWER.lock().unwrap());
             // println!("Starting game with word {}", word);
             game.lock().unwrap().set_word(word.clone());
             state.lock().unwrap().set_word(word.to_uppercase());

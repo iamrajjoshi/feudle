@@ -5982,7 +5982,7 @@ window.addEventListener("DOMContentLoaded", function () {
     //const response = fetch("http://127.0.0.1:8000/answer").then(response => response.text().then(text => c_word = text));
     // console.log(response.text());
     // c_word = await response.text();
-    answer(10000);
+    answer(1);
     Keyboard.init();
 
 
