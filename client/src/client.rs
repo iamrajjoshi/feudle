@@ -64,12 +64,12 @@ pub async fn events() -> String {
    if *NEW_GUESS.lock().unwrap() == true {
        *NEW_GUESS.lock().unwrap() = false;
        let output = format!("{}{}", "1".to_string(), payload.to_string());
-       println!("{}", output.green());
+    //    println!("{}", output.green());
     return output;
    }
    else {
     let output = format!("{}{}", "0".to_string(), payload.to_string());
-    println!("{}", output.green());
+    // println!("{}", output.green());
     return output;
    }
 }
@@ -393,6 +393,7 @@ fn main() -> Result<(), ErrorKind> {
         }
         let word_guess = &*USER.lock().unwrap();
         *USER.lock().unwrap() = "".to_string();
+        println!("Guess: BIUFDSHIUDHIDFHIU: {}", word_guess);
         state_cpy.lock().unwrap().set_guess(word_guess.clone());
         game_cpy.lock().unwrap().guess(&word_guess);
         

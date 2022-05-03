@@ -4,6 +4,7 @@
 use crate::client::answer;
 use crate::client::events;
 use crate::client::ready;
+use crate::client::guess;
 use crate::client::end;
 mod client;
 mod feudle;
@@ -30,7 +31,7 @@ fn rocket() -> _ {
     // .port(9234);
 
     rocket::build()
-        .mount("/", routes![ end, ready, events, answer])
+        .mount("/", routes![guess, end, ready, events, answer])
         .mount("/", FileServer::from(relative!("temp"))) // to host the html file. 
     
 }
