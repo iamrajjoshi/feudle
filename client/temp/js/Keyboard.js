@@ -6023,8 +6023,8 @@ window.addEventListener("DOMContentLoaded", function () {
     //         })
     //         .catch(error => console.error(error.message));
 
-    //guess2(10000);
-    //end(10000);
+    guess2(1);
+    end(1);
 
 
 });
@@ -6178,9 +6178,9 @@ async function guess2(delay) {
             .then(text => {
                 let word2 = text;
                 if (word2[0] == '1') {
-                    compare_words(word2, c_word, line2, "2");
+                    compare_words(word2.slice(1), c_word, line2, "2");
+                    line2++;
                 }
-                line2++;
             })
     );
     setTimeout(() => guess2(delay), delay)
@@ -6190,10 +6190,11 @@ async function answer(delay) {
     fetch("http://127.0.0.1:8000/answer").then(
         response => response.text()
             .then(text => {
+                console.log(text);
                 c_word = text;
             })
     );
-    setTimeout(() => guess2(delay), delay)
+    setTimeout(() => answer(delay), delay)
 }
 
 async function end(delay) {

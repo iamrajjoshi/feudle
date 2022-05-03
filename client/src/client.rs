@@ -24,7 +24,7 @@ use rand::Rng;
 lazy_static! {
     static ref READY : Mutex<bool> = Mutex::new(false);
     static ref ANSWER : Mutex<String> = Mutex::new("".to_string());
-    static ref GUESS : Mutex<String> = Mutex::new(String::new());
+    static ref GUESS : Mutex<String> = Mutex::new("".to_string());
     static ref NEW_GUESS : Mutex<bool> = Mutex::new(false);
     static ref END_GAME: Mutex<String> = Mutex::new("-".to_string());
 }
@@ -45,13 +45,13 @@ pub async fn answer() -> String {
     // std::thread::sleep(time::Duration::from_millis(10000));
     // *ANSWER.lock().unwrap()  = "tests".to_string();
     let answer = &*ANSWER.lock().unwrap();
-    println!("{}", "answer".green());
+    // println!("{}", "answer".green());
     answer.to_string()
 }
 
 #[get("/ready")]
 pub async fn ready() -> String {
-    println!("{}", "ready".green());
+    // println!("{}", "ready".green());
     let mut ready = READY.lock().unwrap();
     *ready = true;
     "ready".to_string()
@@ -62,10 +62,14 @@ pub async fn events() -> String {
     let payload = &*GUESS.lock().unwrap();
    if *NEW_GUESS.lock().unwrap() {
        *NEW_GUESS.lock().unwrap() = false;
-    return "1".to_string() + &payload;
+       let output = format!("{}{}", "0".to_string(), payload.to_string());
+       println!("{}", output.green());
+    return output;
    }
    else {
-    return "0".to_string() + &payload;
+    let output = format!("{}{}", "1".to_string(), payload.to_string());
+    println!("{}", output.green());
+    return output;
    }
 }
 
