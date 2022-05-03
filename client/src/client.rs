@@ -26,17 +26,24 @@ lazy_static! {
     static ref ANSWER : Mutex<String> = Mutex::new(String::new());
     static ref GUESS : Mutex<String> = Mutex::new(String::new());
     static ref NEW_GUESS : Mutex<bool> = Mutex::new(false);
+    static ref END_GAME: Mutex<String> = Mutex::new("-".to_string());
+}
+
+#[get("/end")]
+pub fn end() -> String {
+   let end_game =  &*END_GAME.lock().unwrap();
+    end_game.to_string()
 }
 
 #[get("/answer")]
 pub fn answer() -> String {
-    // loop {
-    //     if *ANSWER.lock().unwrap() != String::new() {
-    //         break;
-    //     }
-    // }
-    std::thread::sleep(time::Duration::from_millis(10000));
-    *ANSWER.lock().unwrap()  = "tests".to_string();
+    loop {
+        if *ANSWER.lock().unwrap() != String::new() {
+            break;
+        }
+    }
+    // std::thread::sleep(time::Duration::from_millis(10000));
+    // *ANSWER.lock().unwrap()  = "tests".to_string();
     let answer = &*ANSWER.lock().unwrap();
     println!("{}", "answer".green());
     answer.to_string()
@@ -51,8 +58,17 @@ pub fn ready() -> String {
 
 #[get("/events")]
 pub async fn events() -> String {    
-    "TEASE".to_string()
+    let payload = &*GUESS.lock().unwrap();
+   if *NEW_GUESS.lock().unwrap() {
+       *NEW_GUESS.lock().unwrap() = false;
+    return "1".to_string() + &payload;
+   }
+   else {
+    return "0".to_string() + &payload;
+   }
 }
+
+
 struct ClientState {
     id: PlayerId,
     ready: bool,
@@ -231,6 +247,8 @@ fn handle_packet(packet: &Packet, game: Arc<Mutex<Feudle>>, state: Arc<Mutex<Cli
         x if x == MessageType::GuessEvent as u8 => {
             // let id = data[0];
             let guess = String::from_utf8(data[1..].to_vec()).unwrap();
+            *GUESS.lock().unwrap() = guess.to_string().clone();
+            *NEW_GUESS.lock().unwrap() = true;
             // println!("Player {} guessed {}", id, guess);
             let color_vec = state.lock().unwrap().get_color_vec(guess.clone());
             // print!("Opponent's Guess: {:?}\n", color_vec);
@@ -255,8 +273,10 @@ fn handle_packet(packet: &Packet, game: Arc<Mutex<Feudle>>, state: Arc<Mutex<Cli
             let id = data[0];
             state.lock().unwrap().set_game_over(true);
             if id == state.lock().unwrap().get_id() as u8 {
+                *END_GAME.lock().unwrap() = "1".to_string();
                 println!("You won!");
             } else {
+                *END_GAME.lock().unwrap() = "0".to_string();
                 println!("You lost!");
             }
             return true;

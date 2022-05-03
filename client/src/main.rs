@@ -4,6 +4,7 @@
 use crate::client::answer;
 use crate::client::events;
 use crate::client::ready;
+use crate::client::end;
 mod client;
 mod feudle;
 // use rocket_contrib::json::Json;
@@ -30,7 +31,7 @@ fn rocket() -> _ {
 
     rocket::build()
         .manage(channel::<String>(1024).0)
-        .mount("/", routes![ ready, events, answer])
+        .mount("/", routes![ end, ready, events, answer])
         .mount("/", FileServer::from(relative!("temp"))) // to host the html file. 
     
 }

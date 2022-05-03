@@ -6022,7 +6022,8 @@ window.addEventListener("DOMContentLoaded", function () {
     //         })
     //         .catch(error => console.error(error.message));
 
-    execute1(10000)
+    guess2(10000);
+    end(10000);
 
 });
 
@@ -6169,14 +6170,28 @@ function tick() {
 // events.close();
 // });
 
-async function execute1(delay) {
+async function guess2(delay) {
     fetch("http://127.0.0.1:8000/events").then(
         response => response.text()
             .then(text => {
                 let word2 = text;
-                compare_words(word2, c_word, line2, "2");
+                if (word2[0] == '1') {
+                    compare_words(word2, c_word, line2, "2");
+                }
                 line2++;
             })
     );
-    setTimeout(() => execute1(delay), delay)
+    setTimeout(() => guess2(delay), delay)
+}
+
+async function end(delay) {
+    fetch("http://127.0.0.1:8000/end").then(
+        response => response.text()
+            .then(text => {
+                if (text == '1') {
+                    victory_screen();
+                }
+            })
+    );
+    setTimeout(() => end(delay), delay)
 }
