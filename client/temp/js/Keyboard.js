@@ -5843,6 +5843,10 @@ const Keyboard = {
                                 compare_words(word, c_word, line, "");
                                 line++;
                                 box = 1;
+                                let s = "http://127.0.0.1:8000/guess/".concat(word);
+                                fetch(s).then(response => response.text());
+
+
                                 word = "";
                         }
                         else {
@@ -5911,6 +5915,8 @@ const Keyboard = {
                                     compare_words(word, c_word, line, "");
                                     line++;
                                     box = 1;
+                                    let s = "http://127.0.0.1:8000/guess/".concat(word);
+                                    fetch(s).then(response => response.text());
                                     word = "";
                             }
                             else {

@@ -27,6 +27,7 @@ lazy_static! {
     static ref GUESS : Mutex<String> = Mutex::new("".to_string());
     static ref NEW_GUESS : Mutex<bool> = Mutex::new(false);
     static ref END_GAME: Mutex<String> = Mutex::new("-".to_string());
+    static ref USER: Mutex<String> = Mutex::new("".to_string());
 }
 
 #[get("/end")]
@@ -60,19 +61,24 @@ pub async fn ready() -> String {
 #[get("/events")]
 pub async fn events() -> String {    
     let payload = &*GUESS.lock().unwrap();
-   if *NEW_GUESS.lock().unwrap() {
+   if *NEW_GUESS.lock().unwrap() == true {
        *NEW_GUESS.lock().unwrap() = false;
-       let output = format!("{}{}", "0".to_string(), payload.to_string());
+       let output = format!("{}{}", "1".to_string(), payload.to_string());
        println!("{}", output.green());
     return output;
    }
    else {
-    let output = format!("{}{}", "1".to_string(), payload.to_string());
+    let output = format!("{}{}", "0".to_string(), payload.to_string());
     println!("{}", output.green());
     return output;
    }
 }
 
+#[get("/guess/<word>")]
+pub async fn guess(word : String) -> String {
+    *USER.lock().unwrap() = word;
+    "word".to_string()
+} 
 
 struct ClientState {
     id: PlayerId,
@@ -372,17 +378,21 @@ fn main() -> Result<(), ErrorKind> {
         // for c in state_cpy.lock().unwrap().word.to_string().chars() {
         //     WORD.lock().unwrap().push(c);
         // }
-        let mut word_guess;
+        // let mut word_guess;
         loop {
-            word_guess = String::new();
-            println!("Guess a word");
-            std::io::stdin().read_line(&mut word_guess).expect("Failed to read line");
-            word_guess = word_guess.trim().to_string();
-            if state_cpy.lock().unwrap().check_guess(word_guess.clone()) {
+            if *USER.lock().unwrap() != "" {
                 break;
             }
+            // word_guess = String::new();
+            // println!("Guess a word");
+            // std::io::stdin().read_line(&mut word_guess).expect("Failed to read line");
+            // word_guess = word_guess.trim().to_string();
+            // if state_cpy.lock().unwrap().check_guess(word_guess.clone()) {
+            //     break;
+            // }
         }
-
+        let word_guess = &*USER.lock().unwrap();
+        *USER.lock().unwrap() = "".to_string();
         state_cpy.lock().unwrap().set_guess(word_guess.clone());
         game_cpy.lock().unwrap().guess(&word_guess);
         
