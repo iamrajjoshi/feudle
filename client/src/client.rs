@@ -1,4 +1,3 @@
-// use std::iter::Step;
 use std::net::SocketAddr;
 use std::time::Instant;
 use std::io;
@@ -14,11 +13,7 @@ use local_ip_address::local_ip;
 use colored::*;
 use std::collections::HashSet;
 use resource::get_word;
-use resource::get_dictionary;
 use lazy_static::lazy_static;
-
-use rocket::response::stream::{EventStream, Event};
-use rand::Rng;
 
 
 lazy_static! {
@@ -86,7 +81,6 @@ struct ClientState {
     game_started: bool,
     game_over: bool,
     word: String,
-    dictionary: Vec<String>,
     guessed_letters: HashSet<char>,
     guesses: Vec<String>,
 }
@@ -99,7 +93,6 @@ impl  ClientState {
             game_started: false,
             game_over: false,
             word: String::new(),
-            dictionary: get_dictionary(),
             guessed_letters: HashSet::new(),
             guesses: Vec::new(),
         }
@@ -187,22 +180,22 @@ impl  ClientState {
         color_vec
     }
 
-    pub fn check_guess(&mut self, guess: String) -> bool{
-        let lowercase_guess = guess.to_lowercase();
-        if lowercase_guess.len() != 5 {
-            println!("Guess must be 5 letters long");
-            return false;
-        }
-        if self.guesses.contains(&lowercase_guess) {
-            println!("You already guessed that word");
-            return false;
-        }
-        if !self.dictionary.contains(&lowercase_guess) {
-            println!("That word is not in the dictionary");
-            return false;
-        }
-        return true;
-    }
+    // pub fn check_guess(&mut self, guess: String) -> bool{
+    //     let lowercase_guess = guess.to_lowercase();
+    //     if lowercase_guess.len() != 5 {
+    //         println!("Guess must be 5 letters long");
+    //         return false;
+    //     }
+    //     if self.guesses.contains(&lowercase_guess) {
+    //         println!("You already guessed that word");
+    //         return false;
+    //     }
+    //     if !self.dictionary.contains(&lowercase_guess) {
+    //         println!("That word is not in the dictionary");
+    //         return false;
+    //     }
+    //     return true;
+    // }
     
     pub fn set_guess(&mut self, guess: String) {
         self.guesses.push(guess.to_uppercase());
