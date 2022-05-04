@@ -6000,16 +6000,17 @@ function compare_words(w, a, line, num) {
     console.log(ans);
     var count = 0;
     for(var i = 0; i < 5; i++) {
-        const s2 = "line" + line.toString() + "box" + (i+1).toString();
-        document.getElementById(s2).style.color = "rgb(255, 255, 255)";
-        document.getElementById(s2).style.border = "0px solid black";
-        document.getElementById(s2).style.margin = "4.5px";
-        document.getElementById(s2).style.fontSize = "20px";
-        document.getElementById(s2).style.height = "58px";
-        document.getElementById(s2).style.width = "59px";
+        
+            const s2 = num + "line" + line.toString() + "box" + (i+1).toString();
+            document.getElementById(s2).style.color = "rgb(255, 255, 255)";
+            document.getElementById(s2).style.border = "0px solid black";
+            document.getElementById(s2).style.margin = "4.5px";
+            document.getElementById(s2).style.fontSize = "20px";
+            document.getElementById(s2).style.height = "58px";
+            document.getElementById(s2).style.width = "59px";
         if(word[i] == ans[i]) {
             change_color_green(i+1, line, num);
-            document.getElementById(word[i].toUpperCase()).style.background = "rgba(23, 255, 11, 0.384)";
+            if(num == "") document.getElementById(word[i].toUpperCase()).style.background = "rgba(23, 255, 11, 0.384)";
             count++;
         }
         else {
@@ -6017,14 +6018,16 @@ function compare_words(w, a, line, num) {
             for(var j = 0; j < 5 ; j++) {
                 if(i!=j && word[i] == ans[j]) {
                     change_color_yellow(i+1, line, num);
-                    if(document.getElementById(word[i].toUpperCase()).style.background != "rgba(23, 255, 11, 0.384)")
-                        document.getElementById(word[i].toUpperCase()).style.background = "rgba(255, 243, 11, 0.524)";
+                    if(num == "") {
+                        if(document.getElementById(word[i].toUpperCase()).style.background != "rgba(23, 255, 11, 0.384)")
+                            document.getElementById(word[i].toUpperCase()).style.background = "rgba(255, 243, 11, 0.524)";
+                    }
                     flag = 1;
                 }
             }
             if(flag == 0) {
                 change_color_grey(i+1,line, num);
-                document.getElementById(word[i].toUpperCase()).style.background = "rgba(94, 97, 75, 0.333)";
+                if(num == "") document.getElementById(word[i].toUpperCase()).style.background = "rgba(94, 97, 75, 0.333)";
             }
         }
     }
