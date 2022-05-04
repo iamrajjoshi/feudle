@@ -6058,9 +6058,6 @@ function compare_words(w, a, line, num) {
             if(flag == 0) change_color_grey(i+1,line, num);
         }
     }
-    if(count == 5) {
-        victory_screen();
-    }
 }
 
 function change_color_green(box, line, num) {
@@ -6078,6 +6075,16 @@ function change_color_yellow(box, line, num) {
 
 function victory_screen() {
     var vc_screen = document.getElementById("vc_screen");
+    vc_screen.style.display = "block";
+    window.onclick = function(event) {
+        if (event.target == vc_screen) {
+          vc_screen.style.display = "none";
+        }
+    }
+}
+
+function lost_screen() {
+    var vc_screen = document.getElementById("lose_screen");
     vc_screen.style.display = "block";
     window.onclick = function(event) {
         if (event.target == vc_screen) {
@@ -6207,8 +6214,13 @@ async function end(delay) {
     fetch("http://127.0.0.1:8000/end").then(
         response => response.text()
             .then(text => {
+
                 if (text == '1') {
                     victory_screen();
+                }
+
+                if (text == '0') {
+                    lost_screen();
                 }
             })
     );
