@@ -32,7 +32,7 @@ hr.solid {
 }
 
 .box {
-    border: 0.1px solid black; margin: 4px; height: 55px; width: 59px; float: left; display: inline-flex; align-items: center; justify-content: center; vertical-align: top; text-size-adjust: 40px;
+    border: 0.1px solid black; margin: 4px; height: 55px; width: 59px; float: left; display: inline-flex; align-items: center; justify-content: center; vertical-align: top; font-weight: 900; font-size: 20px;
     /*box-shadow: 2px 2px 2px 2px #888888;*/
 
 }

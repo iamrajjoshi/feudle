@@ -5825,7 +5825,7 @@ const Keyboard = {
         const keyLayout = [
             "R", "I", "Y", "A", "T", "H", "E", "G", "O", "D",
             "B", "C", "F", "J", "K", "L", "M", "N", "P","backspace", 
-            "Q", "U", "V", "W", "X", "Y", "Z", "enter",
+            "Q", "U", "V", "W", "X", "S", "Z", "enter",
         ];
 
         // Creates HTML for an icon
@@ -5879,6 +5879,7 @@ const Keyboard = {
         });
         keyLayout.forEach(key => {
             const keyElement = document.createElement("button");
+            keyElement.id = key.toUpperCase();
             const insertLineBreak = ["backspace", "D", "enter", "?"].indexOf(key) !== -1;
 
             // Add attributes/classes
@@ -5958,7 +5959,6 @@ const Keyboard = {
 };
 
 function get_answer() {
-    
     return data;
 }
 
@@ -5982,52 +5982,9 @@ window.addEventListener("DOMContentLoaded", function () {
             
         
         }
-        //
-    // subscribe("/events");
-    // c_word = get_answer();
-    //const response = fetch("http://127.0.0.1:8000/answer").then(response => response.text().then(text => c_word = text));
-    // console.log(response.text());
-    // c_word = await response.text();
     answer(1);
+    
     Keyboard.init();
-
-
-    // const events = new EventSource("/events");
-
-    //     events.addEventListener("message", (ev) => {
-    //         console.log("raw data", ev.data);
-    //         word2 = ev.data;
-    //         compare_words(word2, c_word, line2, "2");
-    //         line2++;
-    //         if(line2 == 7) events.close();
-    //     });
-
-    //     events.addEventListener("open", () => {
-    //         console.log(`connected to event stream at ${uri}`);
-    //     });
-
-    // while(true) {
-    //     const response = fetch("http://127.0.0.1:8000/events").then(esponse => response.text().then(text => {
-    //         let word2 = text;
-    //         compare_words(word2, c_word, line2, "2");
-    //         line2++;
-    //     }));
-    //     if(line2 == 7) events.close();
-    // }
-
-    // const fetchPlus = (url, retry) =>
-    //     fetch(url, retry)
-    //         .then(res => {
-    //         if (res.ok) {
-    //             return res.text()
-    //         }
-    //         if(line2 == 7) throw new Error(res.status);
-    //         if (retries > 0) {
-    //             return fetchPlus(url, retries)
-    //         }
-    //         throw new Error(res.status)
-    //         })
-    //         .catch(error => console.error(error.message));
 
     guess2(1);
     end(1);
@@ -6043,8 +6000,16 @@ function compare_words(w, a, line, num) {
     console.log(ans);
     var count = 0;
     for(var i = 0; i < 5; i++) {
+        const s2 = "line" + line.toString() + "box" + (i+1).toString();
+        document.getElementById(s2).style.color = "rgb(255, 255, 255)";
+        document.getElementById(s2).style.border = "0px solid black";
+        document.getElementById(s2).style.margin = "4.5px";
+        document.getElementById(s2).style.fontSize = "20px";
+        document.getElementById(s2).style.height = "58px";
+        document.getElementById(s2).style.width = "59px";
         if(word[i] == ans[i]) {
             change_color_green(i+1, line, num);
+            document.getElementById(word[i].toUpperCase()).style.background = "rgba(23, 255, 11, 0.384)";
             count++;
         }
         else {
@@ -6052,10 +6017,15 @@ function compare_words(w, a, line, num) {
             for(var j = 0; j < 5 ; j++) {
                 if(i!=j && word[i] == ans[j]) {
                     change_color_yellow(i+1, line, num);
+                    if(document.getElementById(word[i].toUpperCase()).style.background != "rgba(23, 255, 11, 0.384)")
+                        document.getElementById(word[i].toUpperCase()).style.background = "rgba(255, 243, 11, 0.524)";
                     flag = 1;
                 }
             }
-            if(flag == 0) change_color_grey(i+1,line, num);
+            if(flag == 0) {
+                change_color_grey(i+1,line, num);
+                document.getElementById(word[i].toUpperCase()).style.background = "rgba(94, 97, 75, 0.333)";
+            }
         }
     }
 }
@@ -6070,7 +6040,7 @@ function change_color_grey(box, line, num) {
 }
 function change_color_yellow(box, line, num) {
     const s3 = num + "line" + line.toString() + "box" + box.toString();
-    document.getElementById(s3).style.backgroundColor = "#c1cc5c";
+    document.getElementById(s3).style.backgroundColor = "rgb(239, 187, 16)";
 }
 
 function victory_screen() {
