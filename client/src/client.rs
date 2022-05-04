@@ -391,9 +391,9 @@ fn main() -> Result<(), ErrorKind> {
             //     break;
             // }
         }
-        let word_guess = &*USER.lock().unwrap();
-        *USER.lock().unwrap() = "".to_string();
-        println!("Guess: BIUFDSHIUDHIDFHIU: {}", word_guess);
+        let mut word_guess = USER.lock().unwrap();
+        // *USER.lock().unwrap() = "".to_string();
+        println!("Guess: BIUFDSHIUDHIDFHIU: {}", *word_guess);
         state_cpy.lock().unwrap().set_guess(word_guess.clone());
         game_cpy.lock().unwrap().guess(&word_guess);
         
@@ -402,7 +402,7 @@ fn main() -> Result<(), ErrorKind> {
         payload.append(&mut word_vec);
         send_packet(&sender_cpy, server_address, MessageType::GuessEvent, payload);
         // game_cpy.lock().unwrap().print_word();
-
+        *word_guess = "".to_string();
         if game_cpy.lock().unwrap().check_win() {
             // let id = state_cpy.lock().unwrap().get_id();
             send_packet(&sender_cpy, server_address, MessageType::FinishEvent, vec![state_cpy.lock().unwrap().get_id()]);
