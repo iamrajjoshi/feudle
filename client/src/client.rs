@@ -26,14 +26,13 @@ lazy_static! {
     static ref ANSWER : Mutex<String> = Mutex::new("".to_string());
     static ref GUESS : Mutex<String> = Mutex::new("".to_string());
     static ref NEW_GUESS : Mutex<bool> = Mutex::new(false);
-    static ref END_GAME: Mutex<String> = Mutex::new("-".to_string());
+    static ref END_GAME: Mutex<String> = Mutex::new("".to_string());
     static ref USER: Mutex<String> = Mutex::new("".to_string());
 }
 
 #[get("/end")]
 pub async fn end() -> String {
    let end_game =  &*END_GAME.lock().unwrap();
-   print!("{}", end_game); 
    end_game.to_string()
 }
 
@@ -332,7 +331,7 @@ fn main() -> Result<(), ErrorKind> {
     // socket = Socket::bind_with_config("127.0.0.1:8452", config).unwrap();
 
     // Tell server to add the client
-    let server_address = "192.168.0.110:8001".parse::<SocketAddr>().unwrap();
+    let server_address = "192.168.0.107:8001".parse::<SocketAddr>().unwrap();
     let (sender, receiver) = (
         socket.get_packet_sender(), socket.get_event_receiver());
     send_packet(&sender, server_address, MessageType::JoinEvent, vec![]);

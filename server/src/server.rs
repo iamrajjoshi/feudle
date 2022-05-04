@@ -170,7 +170,7 @@ pub fn server() -> Result<(), ErrorKind> {
         heartbeat_interval: Some(time::Duration::from_millis(10)),
         ..Config::default()
     };
-    let mut socket = Socket::bind_with_config("192.168.0.110:8001", config).unwrap();
+    let mut socket = Socket::bind_with_config("192.168.0.107:8001", config).unwrap();
     println!("Listening on 192.168.0.110:8001");
 
     let (sender, receiver) = (
