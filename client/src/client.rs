@@ -33,7 +33,8 @@ lazy_static! {
 #[get("/end")]
 pub async fn end() -> String {
    let end_game =  &*END_GAME.lock().unwrap();
-    end_game.to_string()
+   print!("{}", end_game); 
+   end_game.to_string()
 }
 
 #[get("/answer")]
@@ -393,7 +394,7 @@ fn main() -> Result<(), ErrorKind> {
         }
         let mut word_guess = USER.lock().unwrap();
         // *USER.lock().unwrap() = "".to_string();
-        println!("Guess: BIUFDSHIUDHIDFHIU: {}", *word_guess);
+        // println!("Guess: BIUFDSHIUDHIDFHIU: {}", *word_guess);
         state_cpy.lock().unwrap().set_guess(word_guess.clone());
         game_cpy.lock().unwrap().guess(&word_guess);
         
