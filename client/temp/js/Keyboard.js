@@ -6000,7 +6000,7 @@ function compare_words(w, a, line, num) {
     console.log(ans);
     var count = 0;
     for(var i = 0; i < 5; i++) {
-        
+        if (num == "") {
             const s2 = num + "line" + line.toString() + "box" + (i+1).toString();
             document.getElementById(s2).style.color = "rgb(255, 255, 255)";
             document.getElementById(s2).style.border = "0px solid black";
@@ -6008,6 +6008,7 @@ function compare_words(w, a, line, num) {
             document.getElementById(s2).style.fontSize = "20px";
             document.getElementById(s2).style.height = "58px";
             document.getElementById(s2).style.width = "59px";
+        }
         if(word[i] == ans[i]) {
             change_color_green(i+1, line, num);
             if(num == "") document.getElementById(word[i].toUpperCase()).style.background = "rgba(23, 255, 11, 0.384)";
