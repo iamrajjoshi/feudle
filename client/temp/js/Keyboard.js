@@ -6005,7 +6005,7 @@ function compare_words(w, a, line, num) {
             document.getElementById(s2).style.color = "rgb(255, 255, 255)";
             document.getElementById(s2).style.border = "0px solid black";
             document.getElementById(s2).style.margin = "4.5px";
-            document.getElementById(s2).style.fontSize = "20px";
+            document.getElementById(s2).style.fontSize = "25px";
             document.getElementById(s2).style.height = "58px";
             document.getElementById(s2).style.width = "59px";
         }
@@ -6021,7 +6021,7 @@ function compare_words(w, a, line, num) {
                     change_color_yellow(i+1, line, num);
                     if(num == "") {
                         if(document.getElementById(word[i].toUpperCase()).style.background != "rgba(23, 255, 11, 0.384)")
-                            document.getElementById(word[i].toUpperCase()).style.background = "rgba(255, 243, 11, 0.524)";
+                            document.getElementById(word[i].toUpperCase()).style.background = "rgba(239, 187, 16,0.7)a";
                     }
                     flag = 1;
                 }

@@ -1,5 +1,5 @@
 .keyboard {
-    position: fixed; left: 0; bottom: 0; width: 100%; padding: 5px 0; background: #104980; box-shadow: 0 0 50px rgba(0, 0, 0, 0.5); user-select: none; transition: bottom 0.4s;
+    position: fixed; left: 0; bottom: 0; width: 100%; padding: 5px 0; background: #3a77b0; box-shadow: 0 0 50px rgba(0, 0, 0, 0.5); user-select: none; transition: bottom 0.4s;
 }
 
 .settings {
